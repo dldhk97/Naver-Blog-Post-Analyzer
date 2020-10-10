@@ -1,5 +1,7 @@
 import string
 
+# 멀디미디어 정보를 저장하는 객체
+# multimedia_type에는 문자열이 저장되며, image, imoticon, video, hyperlink, etc가 저장됨.
 class MultiMedia():
     def __init__(self, multimedia_type, src, width, height):
         self._multimedia_type = multimedia_type

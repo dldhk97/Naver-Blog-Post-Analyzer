@@ -1,10 +1,6 @@
 from analyzer import lorem_analyzer
 from crawler import naver_blog_post_crawler
 
-def run():
-    print('Naver-Blog-Post_Analyzer server started')
-    pass
-
 def printMenu():
     print('1. 모듈 로드')
     print('2. 원본 문장 생성')
@@ -46,10 +42,7 @@ def console():
 
 if __name__ == '__main__':
     print('테스트 서버 시작')
-    print('모듈 자동 로드')
-    lorem_analyzer.load_module()
+    # print('KoGPT2 모듈 로드')       # 모듈 로드를 해야 KoGPT2를 사용할 수 있음
+    # lorem_analyzer.load_module()
     console()
     print('테스트 서버 종료')
-
-if __name__ == '__main__':
-    run()

@@ -112,27 +112,3 @@ def task_crawl_multimedia():
         multimediacrawler.get_multimedia(url)
     else:
         print('URL이 올바르지 않습니다.')
-
-# 간단한 CLI
-# def simple_cli():
-#     while True:
-#         try:
-#             print('1. 검색어로 크롤링')
-#             print('2. URL로 하나의 게시글 크롤링')
-#             print('3. URL로 하나의 게시글 멀티미디어 크롤링')
-#             print('4. 종료')
-#             user_input = input()
-
-#             if user_input is '1':
-#                 task_crawl_by_search_word()
-#             elif user_input is '2':
-#                 task_crawl_single_post()
-#             elif user_input is '3':
-#                 task_crawl_multimedia()
-#             elif user_input is '4':
-#                 break
-
-#         except Exception as e:
-#             print(e)
-
-#     print('종료합니다')
