@@ -268,7 +268,7 @@ def get_multimedia(blog_post_url):
         if entire_texts_pixel is not 0:
             print('텍스트 비율 : ', str(round(entire_texts_ratio, 3) * 100), '%')
 
-        # 번외, 그럼 공백 및 텍스트의 비율은?
+        # 공백 비율
         left_pixel = entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel - entire_texts_pixel
         print('공백의 비율 : ', str(round(left_pixel / entire_content_pixel, 3) * 100 ), '%')
         pass
