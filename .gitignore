@@ -132,3 +132,7 @@ dmypy.json
 /crawler/constants.py
 /crawler/crawl
 /crawl
+
+# vscode
+.vscode/
+*.code-workspace
