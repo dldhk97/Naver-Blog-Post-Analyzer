@@ -2,8 +2,8 @@ import os, platform
 import string
 from selenium import webdriver
 from bs4 import BeautifulSoup
-from naverblogcrawler import parse_log_no, parse_blog_id, parse_main_content, parse_real_blog_post_url, parse_body_identifier
-from multimedia import MultiMedia
+from . import naverblogcrawler
+from . import multimedia
 
 # 설치되어있는 크롬의 버전에 맞는 드라이버를 사용하십시오.
 driver = None
@@ -108,14 +108,14 @@ def get_multimedia(blog_post_url):
             prepare_selenium()
 
         # 일반 url에서 bs4로 log_no, blog_id가 포함된 real_blog_post_url을 추출
-        real_blog_post_url = parse_real_blog_post_url(blog_post_url)
+        real_blog_post_url = naverblogcrawler.parse_real_blog_post_url(blog_post_url)
 
         # 리얼 블로그 주소를 셀레니움으로 파싱
         driver.get(real_blog_post_url)
         
         # 게시물 번호 추출 후 본문 식별자 파악
-        log_no = parse_log_no(real_blog_post_url)
-        body_identifier = parse_body_identifier(log_no).split('#')[1]
+        log_no = naverblogcrawler.parse_log_no(real_blog_post_url)
+        body_identifier = naverblogcrawler.parse_body_identifier(log_no).split('#')[1]
 
         # 본문 파싱
         blog_post_content = driver.find_element_by_id(body_identifier)

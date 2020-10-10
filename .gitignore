@@ -131,3 +131,4 @@ dmypy.json
 # crawler
 /crawler/constants.py
 /crawler/crawl
+/crawl

@@ -8,8 +8,8 @@ import urllib.error
 import urllib.parse
 import string
 from bs4 import BeautifulSoup
-from constants import NaverAPI
-from blogpost import BlogPost
+from . import blogpost
+from . import constants
 from pykospacing import spacing
 
 
@@ -23,8 +23,8 @@ def get_blog_search_result_pagination_count(search_blog_keyword, display_count):
     url = "https://openapi.naver.com/v1/search/blog?query=" + encode_search_keyword
     request = urllib.request.Request(url)
 
-    request.add_header("X-Naver-Client-Id", NaverAPI.NAVER_CLIENT_ID)
-    request.add_header("X-Naver-Client-Secret", NaverAPI.NAVER_CLIENT_SECRET)
+    request.add_header("X-Naver-Client-Id", constants.NaverAPI.NAVER_CLIENT_ID)
+    request.add_header("X-Naver-Client-Secret", constants.NaverAPI.NAVER_CLIENT_SECRET)
 
     response = urllib.request.urlopen(request)
     response_code = response.getcode()
@@ -200,7 +200,7 @@ def pasre_blog_post(blog_post_url, api_response_item=None):
             # videos = parse_videos(main_content)               # 비디오 목록 추출(유튜브 or 네이버TV)
             tags = parse_tags(blog_id, log_no)                # 태그 추출(태그는 레이지로딩인거같아 파싱 불가. Json으로 따로 추출)
 
-            current_blog_post = BlogPost(blog_id, log_no, blog_post_url, title, description, date, blog_name, hyperlinks, tags, body)
+            current_blog_post = blogpost.BlogPost(blog_id, log_no, blog_post_url, title, description, date, blog_name, hyperlinks, tags, body)
             return current_blog_post
     else:
         print(blog_post_url + ' 는 네이버 블로그가 아니라 패스합니다')
@@ -215,8 +215,8 @@ def get_blog_post(search_blog_keyword, display_count, search_result_blog_page_co
 
         request = urllib.request.Request(url)
 
-        request.add_header("X-Naver-Client-Id", NaverAPI.NAVER_CLIENT_ID)
-        request.add_header("X-Naver-Client-Secret", NaverAPI.NAVER_CLIENT_SECRET)
+        request.add_header("X-Naver-Client-Id", constants.NaverAPI.NAVER_CLIENT_ID)
+        request.add_header("X-Naver-Client-Secret", constants.NaverAPI.NAVER_CLIENT_SECRET)
 
         response = urllib.request.urlopen(request)
         response_code = response.getcode()
