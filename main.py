@@ -34,15 +34,12 @@ def console():
 
         elif user_input == '4':
             naver_blog_post_crawler.task_crawl_by_search_word()
-            break
 
         elif user_input == '5':
             naver_blog_post_crawler.task_crawl_single_post()
-            break
 
         elif user_input == '6':
             naver_blog_post_crawler.task_crawl_multimedia()
-            break
 
         elif user_input == '7':
             break

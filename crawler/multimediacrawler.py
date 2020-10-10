@@ -53,9 +53,9 @@ def parse_images(blog_post_content):
 
             # 네이버 이모티콘인경우 이모티콘 리스트에 추가
             if 'storep-phinf.pstatic.net' in src:
-                imoticon_list.append(MultiMedia('imoticon', src, width, height))
+                imoticon_list.append(multimedia.MultiMedia('imoticon', src, width, height))
             else:
-                image_list.append(MultiMedia('image', src, width, height))
+                image_list.append(multimedia.MultiMedia('image', src, width, height))
 
         except Exception as e:
             print('[parse_images] ERROR : ' , e)
@@ -74,7 +74,7 @@ def parse_videos(blog_post_content):
                 width = node.size['width']
                 height = node.size['height']
 
-                video_list.append(MultiMedia('video', src, width, height))
+                video_list.append(multimedia.MultiMedia('video', src, width, height))
         except Exception as e:
             print('[parse_videos(Y)] ERROR : ' , e)
 
@@ -90,7 +90,7 @@ def parse_videos(blog_post_content):
 
             # 네이버 동영상 URL은 html에 안나타나는듯, cavas 중 크기가 0 이상인것을 영상 목록에 추가함.
             if width > 0 and height > 0:
-                video_list.append(MultiMedia('video', s, width, height))
+                video_list.append(multimedia.MultiMedia('video', s, width, height))
         except Exception as e:
             print('[parse_videos(N)] ERROR : ' , e)
 
