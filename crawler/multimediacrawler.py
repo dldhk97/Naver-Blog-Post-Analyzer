@@ -123,7 +123,7 @@ def parse_etc(blog_post_content):
     for node in blog_post_content.find_elements_by_tag_name('iframe'):
         try:
             if 'www.youtube.com' in node.get_attribute('src'):
-                pass
+                continue
             
             src = node.get_attribute('src')
             width = node.size['width']
@@ -241,7 +241,8 @@ def get_multimedia(blog_post_url):
             print('기타 비율 : ', str(round(entire_etcs_ratio, 3) * 100), '%')
 
         # 번외, 그럼 공백 및 텍스트의 비율은?
-        print('텍스트 및 공백의 비율 : ', str(round((entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel) / entire_content_pixel, 3) * 100 ), '%')
+        left_pixel = entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel
+        print('텍스트 및 공백의 비율 : ', str(round(left_pixel / entire_content_pixel, 3) * 100 ), '%')
         pass
 
     except Exception as e:
