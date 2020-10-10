@@ -42,7 +42,7 @@ def console():
 
 if __name__ == '__main__':
     print('테스트 서버 시작')
-    # print('KoGPT2 모듈 로드')       # 모듈 로드를 해야 KoGPT2를 사용할 수 있음
-    # lorem_analyzer.load_module()
+    print('KoGPT2 모듈 로드')       # 모듈 로드를 해야 KoGPT2를 사용할 수 있음
+    lorem_analyzer.load_module()
     console()
     print('테스트 서버 종료')

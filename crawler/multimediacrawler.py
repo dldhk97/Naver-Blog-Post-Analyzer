@@ -157,15 +157,17 @@ def parse_text(blog_post_content):
 
 # 게시글 타입별 본문 지정. 본문만 선택할 수 있으면 본문 노드 반환.(Selenium)
 def parse_main_content(content):
-    main = content.find_element_by_class_name('se-main-container')
-    if main:
-        return main
-    else:
-        main = content.find_element_by_class_name('__se_component_area')
-        if main:
-            return main
-        else:
-            return content
+    try:
+        return content.find_element_by_class_name('se-main-container')
+    except Exception as e:
+        print('parse_main_content:: Cannot find se-main-container')
+    
+    try:
+        return content.find_element_by_class_name('__se_component_area')
+    except Exception as e:
+        print('parse_main_content:: Cannot find __se_component_area')
+
+    return content
 
 def get_multimedia(blog_post_url):
     # 네이버 블로그인 경우만 처리함.
