@@ -48,9 +48,18 @@ def parse_images(blog_post_content):
             # 섬네일인 경우 패스
             elif 'http://blogpfthumb.phinf.naver.net/' in src:
                 continue
-
+            # 영상의 섬네일?
+            elif src.startswith('data:image/'):
+                print('WARNING! It seems video thumbnail.')
+                # print(src)
+                continue
+            
             width = node.size['width']
             height = node.size['height']
+
+            # 크기가 0이면 패스
+            if width * height <= 0:
+                continue
 
             # 네이버 이모티콘인경우 이모티콘 리스트에 추가
             if 'storep-phinf.pstatic.net' in src:
@@ -104,12 +113,12 @@ def parse_hyperlink(blog_post_content):
     for node in blog_post_content.find_elements_by_tag_name('a'):
         try:
             c = node.get_attribute('class')
-            if 'se-oglink' in c:
-                src = node.get_attribute('href')
-                width = node.size['width']
-                height = node.size['height']
+            #if 'se-oglink' in c:
+            src = node.get_attribute('href')
+            width = node.size['width']
+            height = node.size['height']
 
-                hyperlink_list.append(multimedia.MultiMedia('hyperlink', src, width, height))
+            hyperlink_list.append(multimedia.MultiMedia('hyperlink', src, width, height))
         except Exception as e:
             print('[parse_etc] ERROR : ' , e)
 
@@ -139,18 +148,32 @@ def parse_etc(blog_post_content):
 def parse_text(blog_post_content):
     text_list = []
 
-    # 텍스트 잡기
-    for node in blog_post_content.find_elements_by_tag_name('p'):       # span으로 하면 순수히 글자의 크기를 잡고, p로 잡으면 한줄 통째로 잡음
+    # 텍스트 잡기 p
+    for node in blog_post_content.find_elements_by_tag_name("p"):       # span으로 하면 순수히 글자의 크기를 잡고, p로 잡으면 한줄 통째로 잡음
         try:
             src = node.text
             if src and src.strip():
                 width = node.size['width']
                 height = node.size['height']
                 text_list.append(multimedia.MultiMedia('text', src, width, height))
-                # print(src)
+                print(src)
 
         except Exception as e:
             print('[parse_etc] ERROR : ' , e)
+
+    # 틀딱 블로그는 td로 잡아야하드라. 코드가 너무 비효율적인데, xpath로 or 연산했을때 일반 블로그에서 이상하게 되어버려서, 틀 페이지 아닌 페이지 따로 돌려야할듯.
+    if not text_list:
+        for node in blog_post_content.find_elements_by_tag_name("td"):
+            try:
+                src = node.text
+                if src and src.strip():
+                    width = node.size['width']
+                    height = node.size['height']
+                    text_list.append(multimedia.MultiMedia('text', src, width, height))
+                    print(src)
+
+            except Exception as e:
+                print('[parse_etc] ERROR : ' , e)
 
     return text_list
 
