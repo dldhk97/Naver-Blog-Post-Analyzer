@@ -135,6 +135,25 @@ def parse_etc(blog_post_content):
 
     return etc_list
 
+# text 목록 추출
+def parse_text(blog_post_content):
+    text_list = []
+
+    # 텍스트 잡기
+    for node in blog_post_content.find_elements_by_tag_name('p'):       # span으로 하면 순수히 글자의 크기를 잡고, p로 잡으면 한줄 통째로 잡음
+        try:
+            src = node.text
+            if src and src.strip():
+                width = node.size['width']
+                height = node.size['height']
+                text_list.append(multimedia.MultiMedia('text', src, width, height))
+                # print(src)
+
+        except Exception as e:
+            print('[parse_etc] ERROR : ' , e)
+
+    return text_list
+
 
 # 게시글 타입별 본문 지정. 본문만 선택할 수 있으면 본문 노드 반환.(Selenium)
 def parse_main_content(content):
@@ -190,11 +209,12 @@ def get_multimedia(blog_post_url):
         # iframe 파싱
         etcs = parse_etc(main_content)
 
+        # text 파싱
+        texts = parse_text(main_content)
+
         print('parse done')
 
-        # 본문의 전체 크기(사실 제목이랑 )
-        print('content_height', content_height)
-        print('content_width', content_width)
+        # 본문의 전체 크기
         entire_content_pixel = content_height * content_width
 
         # 멀티미디어의 종류별 수, URL 및 가로세로 길이  표시, 그리고 pixel수의 합 구하기
@@ -228,6 +248,12 @@ def get_multimedia(blog_post_url):
             entire_etcs_pixel += e._width * e._height
         entire_etcs_ratio = entire_etcs_pixel / entire_content_pixel
 
+        print('[texts(', len(texts), ')]' )
+        entire_texts_pixel = 0
+        for t in texts:
+            entire_texts_pixel += t._width * t._height
+        entire_texts_ratio = entire_texts_pixel / entire_content_pixel
+
         # 멀티미디어 종류별 비율 구하기
         if entire_images_pixel is not 0:
             print('이미지의 비율 : ', str(round(entire_images_ratio, 3) * 100), '%')
@@ -235,14 +261,16 @@ def get_multimedia(blog_post_url):
             print('이모티콘의 비율 : ', str(round(entire_imos_ratio, 3) * 100), '%')
         if entire_videos_pixel is not 0:
             print('비디오의 비율 : ', str(round(entire_videos_ratio, 3) * 100), '%')
-        if entire_hyperlinks_ratio is not 0:
+        if entire_hyperlinks_pixel is not 0:
             print('하이퍼링크 비율 : ', str(round(entire_hyperlinks_ratio, 3) * 100), '%')
-        if entire_etcs_ratio is not 0:
-            print('기타 비율 : ', str(round(entire_etcs_ratio, 3) * 100), '%')
+        if entire_etcs_pixel is not 0:
+            print('iframe 비율 : ', str(round(entire_etcs_ratio, 3) * 100), '%')
+        if entire_texts_pixel is not 0:
+            print('텍스트 비율 : ', str(round(entire_texts_ratio, 3) * 100), '%')
 
         # 번외, 그럼 공백 및 텍스트의 비율은?
-        left_pixel = entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel
-        print('텍스트 및 공백의 비율 : ', str(round(left_pixel / entire_content_pixel, 3) * 100 ), '%')
+        left_pixel = entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel - entire_texts_pixel
+        print('공백의 비율 : ', str(round(left_pixel / entire_content_pixel, 3) * 100 ), '%')
         pass
 
     except Exception as e:
