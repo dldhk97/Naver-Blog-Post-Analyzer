@@ -50,7 +50,7 @@ def parse_images(blog_post_content):
                 continue
             # 영상의 섬네일?
             elif src.startswith('data:image/'):
-                print('WARNING! It seems video thumbnail.')
+                print('WARNING! This image seems video thumbnail.')     # 중복연산 회피
                 # print(src)
                 continue
             
@@ -114,9 +114,19 @@ def parse_hyperlink(blog_post_content):
         try:
             c = node.get_attribute('class')
             #if 'se-oglink' in c:
-            src = node.get_attribute('href')
+
             width = node.size['width']
             height = node.size['height']
+            if width * height <= 0:
+                continue
+
+            src = node.get_attribute('href')
+            
+            # 하이퍼링크인데 텍스트가 없다? 그럼 하위에 이미지가 있다면 이미지로 취급(중복연산 회피)
+            if not (node.text and node.text.strip()):
+                if len(node.find_elements_by_tag_name('img')) > 0:
+                    print('WARNING! This hyperlink seems image.')
+                    continue
 
             hyperlink_list.append(multimedia.MultiMedia('hyperlink', src, width, height))
         except Exception as e:
