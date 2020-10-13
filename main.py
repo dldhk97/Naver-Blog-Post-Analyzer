@@ -1,3 +1,4 @@
+import torch
 from analyzer import lorem_analyzer
 from crawler import naver_blog_post_crawler
 
