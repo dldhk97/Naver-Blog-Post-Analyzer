@@ -11,7 +11,7 @@
 # 필수 pip 패키지 설치
 python -m pip install -r .\requirements.txt
 
-# torch 설치
+# torch 설치(gpu/cpu 선택적 설치)
 
 # cuda 사용
 python -m pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
