@@ -1,5 +1,5 @@
 import os, sys
-import mysql.connector
+import mysql
 
 # 상위폴더의 모듈 임포트
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
