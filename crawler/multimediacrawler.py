@@ -271,10 +271,10 @@ def get_multimedia(blog_post_url):
         entire_hyperlinks_ratio = calc_ratio(hyperlinks, entire_content_pixel)
         entire_etcs_ratio = calc_ratio(etcs, entire_content_pixel)
         entire_texts_ratio = calc_ratio(texts, entire_content_pixel)
-        lefts_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
+        blanks_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
 
         # 이미지, 이모티콘, 비디오, 하이퍼링크, 기타(iframe), 텍스트, 공백 비율 반환
-        return entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, lefts_ratio
+        return entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, blanks_ratio
 
     except Exception as e:
         print('Multimedia parse failed : ')

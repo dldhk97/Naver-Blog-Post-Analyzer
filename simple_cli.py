@@ -66,7 +66,7 @@ def task_crawl_multimedia():
     print('URL : ')
     url = input()
     if url is not None:
-        images_ratio, imos_ratio, videos_ratio, hyperlinks_ratio, etcs_ratio, texts_ratio, lefts_ratio = multimediacrawler.get_multimedia(url)
+        images_ratio, imos_ratio, videos_ratio, hyperlinks_ratio, etcs_ratio, texts_ratio, blanks_ratio = multimediacrawler.get_multimedia(url)
         
         # 멀티미디어 종류별 비율 표시
         print('이미지의 비율 : ', str(round(images_ratio, 3) * 100), '%')
@@ -75,7 +75,7 @@ def task_crawl_multimedia():
         print('하이퍼링크 비율 : ', str(round(hyperlinks_ratio, 3) * 100), '%')
         print('기타(iframe) 비율 : ', str(round(etcs_ratio, 3) * 100), '%')
         print('텍스트 비율 : ', str(round(texts_ratio, 3) * 100), '%')
-        print('공백 비율 : ', str(round(lefts_ratio, 3) * 100), '%')
+        print('공백 비율 : ', str(round(blanks_ratio, 3) * 100), '%')
     else:
         print('URL이 올바르지 않습니다.')
 
