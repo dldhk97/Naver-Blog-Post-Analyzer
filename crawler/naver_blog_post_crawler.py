@@ -78,37 +78,3 @@ def save_as_csv(file_name_header, blog_post_list):
         print(e)
 
     return
-
-# Simple CLI에서 검색어로 크롤링 할 수 있게 해주는 메소드
-def task_crawl_by_search_word():
-    print('검색어 : ')
-    search_word = input()
-    if search_word is not None:
-        print('크롤링할 포스트의 개수 : ')
-        blog_post_count = input()
-        try:
-            if blog_post_count.isdigit:
-                crawl_by_search_word(search_word, int(blog_post_count))
-            else:
-                print('크롤링할 포스트의 개수가 올바르지 않습니다.')
-        except Exception as e:
-            print(e)
-    else:
-        print('검색어가 올바르지 않습니다.')
-
-# Simple CLI에서 블로그 URL로 크롤링 할 수 있게 해주는 메소드
-def task_crawl_single_post():
-    print('URL : ')
-    url = input()
-    if url is not None:
-        crawl_single_post(url)
-    else:
-        print('URL이 올바르지 않습니다.')
-
-def task_crawl_multimedia():
-    print('URL : ')
-    url = input()
-    if url is not None:
-        multimediacrawler.get_multimedia(url)
-    else:
-        print('URL이 올바르지 않습니다.')

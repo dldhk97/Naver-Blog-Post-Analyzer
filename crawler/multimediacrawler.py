@@ -121,6 +121,14 @@ def parse_hyperlink(blog_post_content):
                 continue
 
             src = node.get_attribute('href')
+
+            # 네이버 지도 패스
+            if "openstreetmap.org/copyright" in src:
+                continue
+            
+            # 네이버 블로그 패스
+            if "blog.naver.com" in src:
+                continue
             
             # 하이퍼링크인데 텍스트가 없다? 그럼 하위에 이미지가 있다면 이미지로 취급(중복연산 회피)
             if not (node.text and node.text.strip()):
@@ -166,7 +174,7 @@ def parse_text(blog_post_content):
                 width = node.size['width']
                 height = node.size['height']
                 text_list.append(multimedia.MultiMedia('text', src, width, height))
-                print(src)
+                # print(src)
 
         except Exception as e:
             print('[parse_etc] ERROR : ' , e)
@@ -202,6 +210,16 @@ def parse_main_content(content):
 
     return content
 
+def calc_ratio(multimedia_list, entire_content_pixel):
+    entire_multimedia_pixel = 0
+
+    for meida in multimedia_list:
+        entire_multimedia_pixel += meida._width * meida._height
+    ratio = entire_multimedia_pixel / entire_content_pixel
+
+    return ratio
+
+
 def get_multimedia(blog_post_url):
     # 네이버 블로그인 경우만 처리함.
     if 'blog.naver.com' not in blog_post_url:
@@ -228,23 +246,16 @@ def get_multimedia(blog_post_url):
         main_content = parse_main_content(blog_post_content)
 
         time.sleep(2)
+
         # 본문 크기 구하기
         content_height = main_content.size['height']
         content_width = main_content.size['width']
 
-        # 이미지와 이모티콘 파싱
+        # html에서 멀티미디어 객체 리스트 뽑아내기
         images, imos = parse_images(main_content)
-
-        # 비디오 파싱
         videos = parse_videos(main_content)
-
-        # hyperlink 파싱
         hyperlinks = parse_hyperlink(main_content)
-
-        # iframe 파싱
         etcs = parse_etc(main_content)
-
-        # text 파싱
         texts = parse_text(main_content)
 
         print('parse done')
@@ -253,60 +264,16 @@ def get_multimedia(blog_post_url):
         entire_content_pixel = content_height * content_width
 
         # 멀티미디어의 종류별 수, URL 및 가로세로 길이  표시, 그리고 pixel수의 합 구하기
-        print('[images(', len(images), ')]' )
-        entire_images_pixel = 0
-        for i in images:
-            entire_images_pixel += i._width * i._height
-        entire_images_ratio = entire_images_pixel / entire_content_pixel
+        entire_images_ratio = calc_ratio(images, entire_content_pixel)
+        entire_imos_ratio = calc_ratio(imos, entire_content_pixel)
+        entire_videos_ratio = calc_ratio(videos, entire_content_pixel)
+        entire_hyperlinks_ratio = calc_ratio(hyperlinks, entire_content_pixel)
+        entire_etcs_ratio = calc_ratio(etcs, entire_content_pixel)
+        entire_texts_ratio = calc_ratio(texts, entire_content_pixel)
+        lefts_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
 
-        print('[imoticons(', len(imos), ')]' )
-        entire_imos_pixel = 0
-        for im in imos:
-            entire_imos_pixel += im._width * im._height
-        entire_imos_ratio = entire_imos_pixel / entire_content_pixel
-
-        print('[videos(', len(videos), ')]' )
-        entire_videos_pixel = 0
-        for v in videos:
-            entire_videos_pixel += v._width * v._height
-        entire_videos_ratio = entire_videos_pixel / entire_content_pixel
-
-        print('[hyperlink(', len(hyperlinks), ')]' )
-        entire_hyperlinks_pixel = 0
-        for h in hyperlinks:
-            entire_hyperlinks_pixel += h._width * h._height
-        entire_hyperlinks_ratio = entire_hyperlinks_pixel / entire_content_pixel
-
-        print('[etcs(', len(etcs), ')]' )
-        entire_etcs_pixel = 0
-        for e in etcs:
-            entire_etcs_pixel += e._width * e._height
-        entire_etcs_ratio = entire_etcs_pixel / entire_content_pixel
-
-        print('[texts(', len(texts), ')]' )
-        entire_texts_pixel = 0
-        for t in texts:
-            entire_texts_pixel += t._width * t._height
-        entire_texts_ratio = entire_texts_pixel / entire_content_pixel
-
-        # 멀티미디어 종류별 비율 구하기
-        if entire_images_pixel is not 0:
-            print('이미지의 비율 : ', str(round(entire_images_ratio, 3) * 100), '%')
-        if entire_imos_pixel is not 0:
-            print('이모티콘의 비율 : ', str(round(entire_imos_ratio, 3) * 100), '%')
-        if entire_videos_pixel is not 0:
-            print('비디오의 비율 : ', str(round(entire_videos_ratio, 3) * 100), '%')
-        if entire_hyperlinks_pixel is not 0:
-            print('하이퍼링크 비율 : ', str(round(entire_hyperlinks_ratio, 3) * 100), '%')
-        if entire_etcs_pixel is not 0:
-            print('iframe 비율 : ', str(round(entire_etcs_ratio, 3) * 100), '%')
-        if entire_texts_pixel is not 0:
-            print('텍스트 비율 : ', str(round(entire_texts_ratio, 3) * 100), '%')
-
-        # 공백 비율
-        left_pixel = entire_content_pixel - entire_images_pixel - entire_imos_pixel - entire_videos_pixel - entire_hyperlinks_pixel - entire_etcs_pixel - entire_texts_pixel
-        print('공백의 비율 : ', str(round(left_pixel / entire_content_pixel, 3) * 100 ), '%')
-        pass
+        # 이미지, 이모티콘, 비디오, 하이퍼링크, 기타(iframe), 텍스트, 공백 비율 반환
+        return entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, lefts_ratio
 
     except Exception as e:
         print('Multimedia parse failed : ')

@@ -6,6 +6,10 @@ from kogpt2.utils import get_tokenizer
 
 MAX_WORD_LEN = 100	# 2번, 문장 생성 기능시 무한루프 방지용 최대단어개수
 
+model = None
+vocab = None
+tok = None
+
 def load_module():
     global model, vocab, tok
     tok_path = get_tokenizer()
@@ -33,7 +37,7 @@ def org_craete_sent(sent):
     return sent
 
 # MAGIC! (NEW)
-def magic(sentence):
+def get_distance(sentence):
     global model, vocab, tok
     cnt = 1
     distance_list = []
@@ -65,9 +69,8 @@ def magic(sentence):
     return distance_list  # 거리가 저장된 배열 반환
 
 # 거리 배열, 평균값, 분산, 표준편차 자동으로 내기
-def magic_describe(sentence, distances):
+def distance_describe(distances):
     print('')
-    print('토큰 : ' + str(tok(sentence)))
     print('거리 배열 : ' + str(distances))
     # 평균값 내보기
     print('평균값 : ' + str(numpy.mean(distances)))
