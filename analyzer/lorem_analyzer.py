@@ -81,8 +81,7 @@ def distance_describe(distances):
 
 def distances_with_token(sentence, distances):
     splited = tok(sentence)
-    x = splited[1:]         # 첫 토큰을 제외한 모든 토큰
 
-    arr = [x, distances]
+    arr = [splited, distances]
 
     return arr
