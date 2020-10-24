@@ -45,7 +45,9 @@ kogpt2_config = {
 }
 
 
-def get_pytorch_kogpt2_model(ctx='cpu', cachedir='~/kogpt2/'):
+cache_dir = 'C:' + os.sep + 'kogpt2' + os.sep
+
+def get_pytorch_kogpt2_model(ctx='cpu', cachedir=cache_dir):
     # download model
     model_info = pytorch_kogpt2
     model_path = _download(model_info['url'],

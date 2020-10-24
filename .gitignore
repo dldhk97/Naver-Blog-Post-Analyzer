@@ -138,3 +138,6 @@ dmypy.json
 
 # main
 constants.py
+
+# idea
+.idea/
