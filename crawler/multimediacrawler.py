@@ -210,6 +210,7 @@ def parse_main_content(content):
 
     return content
 
+# 멀티미디어 비율 계산
 def calc_ratio(multimedia_list, entire_content_pixel):
     entire_multimedia_pixel = 0
 

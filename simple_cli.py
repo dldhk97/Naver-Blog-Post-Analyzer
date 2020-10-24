@@ -22,7 +22,20 @@ def task_org_create_sent():
 def task_get_distance():
     user_sent = input('문장 입력 : ')
     distances = lorem_analyzer.get_distance(user_sent)
-    lorem_analyzer.distance_describe(distances)
+    mean, variance, standard_deviation = lorem_analyzer.distance_describe(distances)
+
+    distances_with_token = lorem_analyzer.distances_with_token(user_sent, distances)
+    print('')
+    print('토큰 : ')
+    print(str(distances_with_token[0]))
+    print(str(distances_with_token[1]))
+    # 평균값 내보기
+    print('평균값 : ' + str(mean))
+    # 분산 내보기
+    print('분산 : ' + str(variance))
+    # 표준편차 구하기
+    print('표준편차 : ' + str(standard_deviation))
+    print('')
 
 def task_crawltask_crawl_by_search_word():
     print('검색어 : ')

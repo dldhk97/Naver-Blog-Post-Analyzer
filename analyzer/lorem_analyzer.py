@@ -68,14 +68,21 @@ def get_distance(sentence):
 
     return distance_list  # 거리가 저장된 배열 반환
 
-# 거리 배열, 평균값, 분산, 표준편차 자동으로 내기
+# 거리 배열, 평균값, 분산, 표준편차 내기
 def distance_describe(distances):
-    print('')
-    print('거리 배열 : ' + str(distances))
     # 평균값 내보기
-    print('평균값 : ' + str(numpy.mean(distances)))
+    mean = numpy.mean(distances)
     # 분산 내보기
-    print('분산 : ' + str(numpy.var(distances)))
+    variance = numpy.var(distances)
     # 표준편차 구하기
-    print('표준편차 : ' + str(numpy.std(distances)))
-    print('')
+    standard_deviation = numpy.std(distances)
+
+    return mean, variance, standard_deviation
+
+def distances_with_token(sentence, distances):
+    splited = tok(sentence)
+    x = splited[1:]         # 첫 토큰을 제외한 모든 토큰
+
+    arr = [x, distances]
+
+    return arr
