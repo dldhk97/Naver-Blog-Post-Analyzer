@@ -21,11 +21,19 @@ python -m pip install torch==1.5.1+cpu -f https://download.pytorch.org/whl/torch
 # KoGPT2 설치
 python -m pip install .\KoGPT2\
 
-# crawler 디렉토리 내 constants.py 생성 (constants.py.bak을 constants.py로 바꾸거나 복사)
-copy .\crawler\constants.py.bak .\crawler\constants.py
+# constants.py 생성 (constants.py.bak을 constants.py로 바꾸거나 복사)
+copy constants.py.bak constants.py
 
 # constants.py 수정 (NaverAPI)
 class NaverAPI(object):
     NAVER_CLIENT_ID = '자신의 네이버 API ID'
     NAVER_CLIENT_SECRET = '자신의 네이버 API SECRET'
+    
+class DB(object):
+    HOST_IP = 'localhost'
+    PORT = '3306'
+    DATABASE_NAME = '데이터베이스 이름'
+    USER = '사용자 이름'
+    PASSWORD = '패스워드'
+    pass
 ```
