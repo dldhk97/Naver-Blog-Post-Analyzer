@@ -1,3 +1,4 @@
+import torch
 import simple_cli
 from multiprocessing  import Process, Queue
 from analyzer import lorem_analyzer
