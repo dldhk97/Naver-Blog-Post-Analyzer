@@ -3,6 +3,7 @@ from crawler import naver_blog_post_crawler
 from crawler import multimediacrawler
 from db import db_connector
 
+# 프린트 메뉴 코드
 def print_menu():
     print('1. 모듈 로드')
     print('2. 원본 문장 생성')
