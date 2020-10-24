@@ -1,16 +1,16 @@
-import re
-import json
-import math
-import datetime
+import os, sys, re, string
+import json, math, datetime
 import requests
 import urllib.request
 import urllib.error
 import urllib.parse
-import string
 from bs4 import BeautifulSoup
 from . import blogpost
-from . import constants
 from pykospacing import spacing
+
+# 상위폴더의 모듈 임포트
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+import constants
 
 
 def naver_blog_crawling(search_blog_keyword, display_count, sort_type, max_count=None):

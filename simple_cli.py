@@ -1,6 +1,7 @@
 from analyzer import lorem_analyzer
 from crawler import naver_blog_post_crawler
 from crawler import multimediacrawler
+from db import db_connector
 
 def print_menu():
     print('1. 모듈 로드')
@@ -9,7 +10,8 @@ def print_menu():
     print('4. 검색어로 크롤링하기')
     print('5. URL로 한 게시글 크롤링하기')
     print('6. URL로 한 게시글 멀티미디어 크롤링하기')
-    print('7. 종료')
+    print('7. DB 연결 테스트')
+    print('q. 종료')
 
 def task_org_create_sent():
     user_word = input('단어 입력 : ')
@@ -63,6 +65,10 @@ def task_crawl_multimedia():
     else:
         print('URL이 올바르지 않습니다.')
 
+def task_test_db_connection():
+    db_connector.test_connection()
+    pass
+
 
 def cli_loop():
     while True:
@@ -87,5 +93,8 @@ def cli_loop():
             task_crawl_multimedia()
 
         elif user_input == '7':
+            task_test_db_connection()
+
+        elif user_input == 'q':
             return 0
         

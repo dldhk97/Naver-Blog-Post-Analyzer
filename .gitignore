@@ -129,10 +129,12 @@ dmypy.json
 .pyre/
 
 # crawler
-/crawler/constants.py
 /crawler/crawl
 /crawl
 
 # vscode
 .vscode/
 *.code-workspace
+
+# main
+constants.py
