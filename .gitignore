@@ -129,15 +129,13 @@ dmypy.json
 .pyre/
 
 # crawler
-/crawler/crawl
-/crawl
+crawler/crawl
 
 # vscode
 .vscode/
-*.code-workspace
 
-# main
-constants.py
+# constants
+nbpaserver_project/constants.py
 
 # idea
 .idea/

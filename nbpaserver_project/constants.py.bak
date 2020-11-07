@@ -1,0 +1,17 @@
+# 자신의 네이버 API ID 및 SECRET을 입력하고, 파일명을 constants.py로 변경하면 됩니다.
+class NaverAPI(object):
+    NAVER_CLIENT_ID = '네이버 API ID'
+    NAVER_CLIENT_SECRET = '네이버 API SECRET'
+
+# DB에 연결하기 위한 상수 정의
+class DBInfo(object):
+    DATABASE_INFO = {
+        'default' : {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'DB 스키마 이름',
+            'USER': '유저 이름',
+            'PASSWORD': '패스워드',
+            'HOST': '주소',
+            'PORT': '포트',
+        }
+    }

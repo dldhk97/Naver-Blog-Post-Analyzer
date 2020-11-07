@@ -5,7 +5,6 @@ image
 tensorflow
 keras
 selenium
-git+https://github.com/haven-jeon/PyKoSpacing.git
 
 gluonnlp == 0.9.1
 mxnet == 1.6.0
@@ -13,4 +12,5 @@ sentencepiece >= 0.1.85
 transformers == 2.11.0
 
 mysqlclient
-sqlalchemy
+
+django == 3.1.3

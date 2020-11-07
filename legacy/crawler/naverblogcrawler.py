@@ -6,7 +6,6 @@ import urllib.error
 import urllib.parse
 from bs4 import BeautifulSoup
 from . import blogpost
-from pykospacing import spacing
 
 # 상위폴더의 모듈 임포트
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
@@ -108,11 +107,19 @@ def parse_blog_id(url):
 def parse_entire_body(content):
     result = str(content.get_text())
 
-    # 공백 및 개행문자 정리
-    result = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', result)
+    # 특수 공백 및 개행문자 정리
+    # result = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', result)
+    
+    # 이스케이프 문자 다 띄어쓰기로 변경
+    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', ' ', result)
 
-    # 띄어쓰기 처리
-    result = spacing(result)
+    # 줄바꿈 문자 처리
+    result = re.sub(r'\n+', '\n', result)
+    result = re.sub(r'(\n*\s+\n+|\n+\s+\n*)', '\n', result)
+    result = re.sub(r'(\n\s|\s\n)', '\n', result)
+
+    # 공백 여러개를 하나로
+    result = re.sub(r'( |\t|\xa0)+', ' ', result)
 
     return result.strip()
 

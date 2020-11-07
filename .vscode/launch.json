@@ -5,11 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: main",
+            "name": "Python: Django Server(port:8080)",
             "type": "python",
             "request": "launch",
-            "program": "main.py",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/nbpaserver_project/manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver", "8080",
+            ],
+            "django": true
         }
     ]
 }

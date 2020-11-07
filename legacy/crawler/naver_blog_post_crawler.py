@@ -48,23 +48,24 @@ def save_as_csv(file_name_header, blog_post_list):
     file_name = now + '-' + file_name_header + '.csv'
 
     try:
-        f = open(save_path + file_name, 'w', encoding=CSV_ENCODING_TYPE)
+        f = open(save_path + file_name, 'w', newline='', encoding=CSV_ENCODING_TYPE)
         wr = csv.writer(f)
         wr.writerow(['blog_id', 'log_no', 'url', 'title', 'body', 'hyperlinks', 'tags'])
         for blog_post in blog_post_list:
             try:
                 if blog_post:
-                    renew_body = blog_post._body.replace('\n',' ')   # 바디에 개행문자가 있으면 csv파일이 제대로 생성 안됨...
+                    renew_body = blog_post._body
+                    print(renew_body)
 
                     hyperlink_list = ''
                     if blog_post._hyperlinks:
                         for link in blog_post._hyperlinks:
-                            hyperlink_list += link + ', '
+                            hyperlink_list += link + '\n'
 
                     tag_list = ''
                     if blog_post._tags:
                         for tag in blog_post._tags:
-                            tag_list += tag + ', '
+                            tag_list += tag + '\n'
 
                     wr.writerow([blog_post._blog_id, blog_post._log_no, blog_post._url, blog_post._title, renew_body, hyperlink_list, tag_list])
                     
