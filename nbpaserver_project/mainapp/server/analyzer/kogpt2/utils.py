@@ -25,8 +25,8 @@ tokenizer = {
     'chksum': '818bfa919d'
 }
 
-
 cache_dir = 'C:' + os.sep + 'kogpt2' + os.sep
+
 def download(url, filename, chksum, cachedir=cache_dir):
     f_cachedir = os.path.expanduser(cachedir)
     os.makedirs(f_cachedir, exist_ok=True)

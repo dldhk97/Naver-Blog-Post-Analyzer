@@ -13,34 +13,37 @@ class BlogInfo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.blog_info_id) + ', ' + self.blog_id + ', ' + self.log_no + ', ' + self.url + ', ' + self.title
+        id = str(self.blog_info_id if self.blog_info_id else '')
+        return id + ', ' + self.blog_id + ', ' + self.log_no + ', ' + self.url + ', ' + self.title
 
 
 class AnalyzedInfo(models.Model):
     analyzed_info_id = models.AutoField(primary_key=True)
     blog_info = models.ForeignKey(BlogInfo, on_delete=models.CASCADE)
     
-    lorem_percentage = models.FloatField()
-    tag_similarity = models.FloatField()
+    lorem_percentage = models.FloatField(default=-1)
+    tag_similarity = models.FloatField(default=-1)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.analyzed_info_id) + ', ' + self.blog_info.blog_id + ', ' + self.blog_info.log_no + ', ' + self.blog_info.title + ', ' + self.blog_info.url + ', ' + str(self.lorem_percentage) + ', ' + str(self.tag_similarity)
+        id = str(self.analyzed_info_id if self.analyzed_info_id else '')
+        return id + ', ' + self.blog_info.blog_id + ', ' + self.blog_info.log_no + ', ' + self.blog_info.title + ', ' + self.blog_info.url + ', ' + str(self.lorem_percentage) + ', ' + str(self.tag_similarity)
 
 class MultimediaRatio(models.Model):
     multimedia_ratio_id = models.AutoField(primary_key=True)
     ratio_type = models.ForeignKey('RatioType', on_delete=models.PROTECT)
     analyzed_info = models.ForeignKey(AnalyzedInfo, on_delete=models.CASCADE)
     
-    ratio = models.FloatField()
+    ratio = models.FloatField(default=-1)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.multimedia_ratio_id) + ', ' + str(self.ratio_type.name) + ', ' + str(self.analyzed_info.analyzed_info_id) + ', ' + str(self.ratio)
+        id = str(self.multimedia_ratio_id if self.multimedia_ratio_id else '')
+        return id + ', ' + str(self.ratio_type.name) + ', ' + str(self.analyzed_info.analyzed_info_id) + ', ' + str(self.ratio)
 
 class Dictionary(models.Model):
     dictionary_id = models.AutoField(primary_key=True)
@@ -53,7 +56,8 @@ class Dictionary(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.dictionary_id) + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.dictionary_type.name + ', ' + self.word
+        id = str(self.dictionary_id if self.dictionary_id else '')
+        return id + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.dictionary_type.name + ', ' + self.word
 
 class Feedback(models.Model):
     feedback_id = models.AutoField(primary_key=True)
@@ -66,7 +70,8 @@ class Feedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.feedback_id) + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.ip + ', ' + str(self.feedback_type.name) + ', ' + self.message
+        id = str(self.feedback_id if self.feedback_id else '')
+        return id + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.ip + ', ' + str(self.feedback_type.name) + ', ' + self.message
 
 class BannedUser(models.Model):
     banned_user_id = models.AutoField(primary_key=True)
@@ -77,7 +82,8 @@ class BannedUser(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.banned_user_id) + ', ' + self.ip + ', ' + self.reason + ', '  + str(self.created_at)
+        id = str(self.banned_user_id if self.banned_user_id else '')
+        return id + ', ' + self.ip + ', ' + self.reason + ', '  + str(self.created_at)
 
 class RatioType(models.Model):
     id = models.AutoField(primary_key=True)

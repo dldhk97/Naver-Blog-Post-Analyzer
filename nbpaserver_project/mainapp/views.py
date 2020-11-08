@@ -4,16 +4,95 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
+from .models import BlogInfo
+from .server import core_task, feedback_task, model_task, ban_task, test_task
+
+# 분석 정보 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
 def get_analyzed_info(request):
     print('Request received from client')
-    
-    req = request.POST
-    name = req['name']
-    birth = req['birth']
-    
-    print('received name : ' + name)
-    print('received birth : ' + birth)
 
-    # send data to client 
-    return JsonResponse({'world': 'earth', 'status': 'hello'})
+    if request.method == 'POST':
+
+        info = BlogInfo()
+        info.blog_id = request.POST['blog_id']
+        info.log_no = request.POST['log_no']
+        info.url = request.POST['url']
+        info.title = request.POST['title']
+        info.body = request.POST['body']
+
+        core_task.get_analyzed_info()
+        
+        print('received BlogInfo : ' + str(info))
+
+        # save
+        # info.save()
+
+        # send data to client 
+        return JsonResponse({'world': 'earth', 'status': 'hello'})
+    
+    print('[SYSTEM]Do not handle get request.')
+    pass
+
+# 키워드 요청 시
+@method_decorator(csrf_exempt, name='dispatch')
+def get_keywords(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def create_feedback(request):
+    pass
+
+################################
+#          admin views         #
+################################
+# Feedback
+
+@method_decorator(csrf_exempt, name='dispatch')
+def get_feedbacks(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def delete_feedback(request):
+    pass
+
+################################
+# Ban
+
+@method_decorator(csrf_exempt, name='dispatch')
+def ban_ip(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def get_banned_ip(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def unban_ip(request):
+    pass
+
+################################
+# Model
+
+@method_decorator(csrf_exempt, name='dispatch')
+def learn_model(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def load_model(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def save_model(request):
+    pass
+
+################################
+# Test
+
+@method_decorator(csrf_exempt, name='dispatch')
+def crawl_single_blog(request):
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
+def crawl_single_blog_multimedia(request):
+    pass

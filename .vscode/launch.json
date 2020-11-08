@@ -11,7 +11,9 @@
             "program": "${workspaceFolder}/nbpaserver_project/manage.py",
             "console": "integratedTerminal",
             "args": [
-                "runserver", "8080",
+                "runserver", 
+                "8080",             // 포트
+                "--noreload",       // startup code가 두번 실행되지 않게 함.
             ],
             "django": true
         }

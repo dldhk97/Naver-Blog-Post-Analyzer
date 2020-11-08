@@ -11,15 +11,24 @@ vocab = None
 tok = None
 
 def load_module():
+    print('[SYSTEM][Analyzer] Start loading module.')
     global model, vocab, tok
-    tok_path = get_tokenizer()
-    model, vocab = get_pytorch_kogpt2_model()
-    tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
-    print('KoGPT2 모듈 로드됨')
+    try:
+        tok_path = get_tokenizer()
+        model, vocab = get_pytorch_kogpt2_model()
+        tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
+        print('[SYSTEM][Analyzer] Load module successful.')
+    except Exception as e:
+        print('[SYSTEM][Analyzer] Failed to load module.', e)
 
 
 def org_craete_sent(sent):
     global model, vocab, tok
+    
+    if model is None:
+        print('[SYSTEM][Analyzer] Load module before use gpt2.')
+        return None
+
     toked = tok(sent)
     cnt = 0
     while 1:
@@ -36,9 +45,14 @@ def org_craete_sent(sent):
         cnt += 1
     return sent
 
-# MAGIC! (NEW)
+# Analyze lorem and get distance(rank) vector
 def get_distance(sentence):
     global model, vocab, tok
+
+    if model is None:
+        print('[SYSTEM][Analyzer] Load module before use gpt2.')
+        return None
+
     cnt = 1
     distance_list = []
     splited = tok(sentence)

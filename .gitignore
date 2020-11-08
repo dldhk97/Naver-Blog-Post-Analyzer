@@ -135,7 +135,7 @@ crawler/crawl
 .vscode/
 
 # constants
-nbpaserver_project/constants.py
+constants.py
 
 # idea
 .idea/
