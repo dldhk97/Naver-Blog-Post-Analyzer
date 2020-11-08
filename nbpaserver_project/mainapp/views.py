@@ -1,35 +1,28 @@
 from django.http import JsonResponse
 
+import json
+
 # for Forbidden(CSRF cookie not set)
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from .models import BlogInfo
-from .server import core_task, feedback_task, model_task, ban_task, test_task
+from .api import core_task, feedback_task, model_task, ban_task, test_task
 
 # 분석 정보 요청 시
+# 클라이언트로부터 url 목록을 받아와 BlogInfo, AnalyzedInfo, MultimediaRatio, Dictionary 등을 반환함.
 @method_decorator(csrf_exempt, name='dispatch')
 def get_analyzed_info(request):
     print('Request received from client')
 
     if request.method == 'POST':
 
-        info = BlogInfo()
-        info.blog_id = request.POST['blog_id']
-        info.log_no = request.POST['log_no']
-        info.url = request.POST['url']
-        info.title = request.POST['title']
-        info.body = request.POST['body']
+        json_array = json.loads(request.body)
 
-        core_task.get_analyzed_info()
-        
-        print('received BlogInfo : ' + str(info))
-
-        # save
-        # info.save()
+        result = core_task.get_analyzed_info(json_array)
 
         # send data to client 
-        return JsonResponse({'world': 'earth', 'status': 'hello'})
+        return JsonResponse(result)
     
     print('[SYSTEM]Do not handle get request.')
     pass

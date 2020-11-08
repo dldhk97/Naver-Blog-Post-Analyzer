@@ -57,7 +57,8 @@ class Dictionary(models.Model):
 
     def __str__(self):
         id = str(self.dictionary_id if self.dictionary_id else '')
-        return id + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.dictionary_type.name + ', ' + self.word
+        blog_info_id = str(self.blog_info.blog_info_id if self.blog_info.blog_info_id else '')
+        return id + ', ' + blog_info_id + ', ' + self.dictionary_type.name + ', ' + self.word
 
 class Feedback(models.Model):
     feedback_id = models.AutoField(primary_key=True)
@@ -71,7 +72,8 @@ class Feedback(models.Model):
 
     def __str__(self):
         id = str(self.feedback_id if self.feedback_id else '')
-        return id + ', ' + str(self.blog_info.blog_info_id) + ', ' + self.ip + ', ' + str(self.feedback_type.name) + ', ' + self.message
+        blog_info_id = str(self.blog_info.blog_info_id if self.blog_info.blog_info_id else '')
+        return id + ', ' + blog_info_id + ', ' + self.ip + ', ' + str(self.feedback_type.name) + ', ' + self.message
 
 class BannedUser(models.Model):
     banned_user_id = models.AutoField(primary_key=True)

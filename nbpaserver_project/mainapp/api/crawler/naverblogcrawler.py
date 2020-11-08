@@ -7,9 +7,24 @@ import urllib.parse
 from bs4 import BeautifulSoup
 from . import blogpost
 
-# 상위폴더의 모듈 임포트
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-import constants
+NAVER_CLIENT_ID = None
+NAVER_CLIENT_SECRET = None
+
+def init(naver_client_id, naver_client_secret):
+    print('[SYSTEM][naverblogcrawler]Init constnats')
+    global NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
+    NAVER_CLIENT_ID = naver_client_id
+    NAVER_CLIENT_SECRET = naver_client_secret
+
+def is_constants_available():
+    if not NAVER_CLIENT_ID:
+        print('[SYSTEM][naverblogcrawler]No Naver_CLIENT_ID')
+        return False
+    if not NAVER_CLIENT_SECRET:
+        print('[SYSTEM][naverblogcrawler]No NAVER_CLIENT_SECRET')
+        return False
+
+    return True
 
 
 def naver_blog_crawling(search_blog_keyword, display_count, sort_type, max_count=None):
@@ -22,8 +37,11 @@ def get_blog_search_result_pagination_count(search_blog_keyword, display_count):
     url = "https://openapi.naver.com/v1/search/blog?query=" + encode_search_keyword
     request = urllib.request.Request(url)
 
-    request.add_header("X-Naver-Client-Id", constants.NaverAPI.NAVER_CLIENT_ID)
-    request.add_header("X-Naver-Client-Secret", constants.NaverAPI.NAVER_CLIENT_SECRET)
+    if is_constants_available() == False:
+        return
+
+    request.add_header("X-Naver-Client-Id", NAVER_CLIENT_ID)
+    request.add_header("X-Naver-Client-Secret", NAVER_CLIENT_SECRET)
 
     response = urllib.request.urlopen(request)
     response_code = response.getcode()
@@ -72,6 +90,7 @@ def parse_main_content(content):
 
 # 페이지 태그 추출
 def parse_tags(blog_id, log_no):
+    tag_list = []
     try:
         url = 'https://blog.naver.com/BlogTagListInfo.nhn?blogId=' + blog_id + '&logNoList=' + log_no
         received_json = requests.get(url).json()                    # Requests로 Json 요청 후 파싱
@@ -79,10 +98,9 @@ def parse_tags(blog_id, log_no):
             raw_tag_name = received_json['taglist'][0]['tagName']
             tag_name = urllib.parse.unquote(raw_tag_name)           # URL을 한글로 디코딩
 
-            tag_list = []
             for tag in tag_name.split(','):
                 tag_list.append(tag)
-            return tag_list
+        return tag_list
     except Exception as e:
         print('[parse_tags][' + str(blog_id) + '/' + str(log_no) +'] ERROR : ' , e)
 
@@ -214,14 +232,17 @@ def pasre_blog_post(blog_post_url, api_response_item=None):
 def get_blog_post(search_blog_keyword, display_count, search_result_blog_page_count, sort_type, max_count=None):
     encode_search_blog_keyword = urllib.parse.quote(search_blog_keyword)
 
+    if is_constants_available == False:
+        return
+
     for i in range(1, search_result_blog_page_count + 1):
         url = "https://openapi.naver.com/v1/search/blog?query=" + encode_search_blog_keyword + "&display=" + str(
             display_count) + "&start=" + str(i) + "&sort=" + sort_type
 
         request = urllib.request.Request(url)
-
-        request.add_header("X-Naver-Client-Id", constants.NaverAPI.NAVER_CLIENT_ID)
-        request.add_header("X-Naver-Client-Secret", constants.NaverAPI.NAVER_CLIENT_SECRET)
+        
+        request.add_header("X-Naver-Client-Id", NAVER_CLIENT_ID)
+        request.add_header("X-Naver-Client-Secret", NAVER_CLIENT_SECRET)
 
         response = urllib.request.urlopen(request)
         response_code = response.getcode()

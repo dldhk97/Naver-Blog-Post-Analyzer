@@ -21,14 +21,16 @@ def crawl_single_post(url):
 
     blog_post = naverblogcrawler.pasre_blog_post(url)
 
-    if blog_post:
-        blog_post_list.append(blog_post)
-    
-    if blog_post_list:
-        file_name_header = blog_post._blog_id + ' ' + blog_post._log_no
+    return blog_post
 
-        print("텍스트 파일로 저장합니다")
-        save_as_csv(file_name_header, blog_post_list)
+    # if blog_post:
+    #     blog_post_list.append(blog_post)
+    
+    # if blog_post_list:
+    #     file_name_header = blog_post._blog_id + ' ' + blog_post._log_no
+
+    #     print("텍스트 파일로 저장합니다")
+    #     save_as_csv(file_name_header, blog_post_list)
 
 # 경로를 주면 폴더를 생성하는 메소드
 def create_directory(path):
