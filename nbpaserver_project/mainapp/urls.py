@@ -18,6 +18,8 @@ urlpatterns = [
     url('admin/model/load', views.load_model, name='admin/model/load'),
     url('admin/model/save', views.save_model, name='admin/model/save'),
 
+    url('admin/test/authorization', views.authorization, name='admin/test/authorization'),
+    url('admin/test/lorem_analyze', views.lorem_analyze, name='admin/test/lorem_analyze'),
     url('admin/test/getanalyzedinfo', views.get_analyzed_info, name='admin/test/getanalyzedinfo'),
     url('admin/test/crawlsingleblog', views.crawl_single_blog, name='admin/test/crawlsingleblog'),
     url('admin/test/crawlsingleblogmedia', views.crawl_single_blog_multimedia, name='admin/test/crawlsingleblogmedia'),

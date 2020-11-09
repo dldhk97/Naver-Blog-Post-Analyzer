@@ -4,16 +4,20 @@
 
 import simple_cli
 
-def main_task():
-    exit_code = simple_cli.cli_loop()
+if __name__ == '__main__':
+    print('Naver Blog Post Analyzer : Admin Client')
+
+    exit_code = -1
+    
+    # 관리자 인증
+    if simple_cli.admin_authorization():
+    
+        exit_code = simple_cli.cli_loop()
+    else:
+        print('관리자 인증에 실패하였습니다.')
+        exit_code = 0;
 
     if exit_code == 0:
         print('정상적으로 종료합니다.')
-    pass
-
-if __name__ == '__main__':
-    print('테스트 관리자 클라이언트 시작')
-
-    main_task()
-
-    
+    else:
+        print('비정상적인 종료입니다.')

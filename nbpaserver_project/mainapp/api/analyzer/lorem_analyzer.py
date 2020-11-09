@@ -92,9 +92,6 @@ def distance_describe(distances):
 
     return mean, variance, standard_deviation
 
-def distances_with_token(sentence, distances):
-    splited = tok(sentence)
-
-    arr = [splited, distances]
-
-    return arr
+# 문장을 주면 토큰화한 문장의 배열 반환(외부호출용)
+def tokenize(sentence):
+    return tok(sentence)

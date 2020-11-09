@@ -2,7 +2,7 @@
 class ServerInfo(object):
     CONNECTION_INFO = {
         'default' : {
-            'HOST': '서버IP',
+            'HOST': '127.0.0.1',
             'PORT': '8080',
         }
     }

@@ -15,3 +15,7 @@ class DBInfo(object):
             'PORT': '포트',
         }
     }
+
+class AdminAccountInfo(object):
+    ADMIN_ID_HASH = "관리자 ID 해시값"
+    ADMIN_PW_HASH = "관리자 PW 해시값"

@@ -7,21 +7,16 @@ import urllib.parse
 from bs4 import BeautifulSoup
 from . import blogpost
 
-NAVER_CLIENT_ID = None
-NAVER_CLIENT_SECRET = None
+NAVER_API_INFO = None
 
-def init(naver_client_id, naver_client_secret):
+def init(naver_api_info):
     print('[SYSTEM][naverblogcrawler]Init constnats')
-    global NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
-    NAVER_CLIENT_ID = naver_client_id
-    NAVER_CLIENT_SECRET = naver_client_secret
+    global NAVER_API_INFO
+    NAVER_API_INFO = naver_api_info
 
 def is_constants_available():
-    if not NAVER_CLIENT_ID:
-        print('[SYSTEM][naverblogcrawler]No Naver_CLIENT_ID')
-        return False
-    if not NAVER_CLIENT_SECRET:
-        print('[SYSTEM][naverblogcrawler]No NAVER_CLIENT_SECRET')
+    if not NAVER_API_INFO:
+        print('[SYSTEM][naverblogcrawler]No NAVER_API_INFO')
         return False
 
     return True
@@ -40,8 +35,8 @@ def get_blog_search_result_pagination_count(search_blog_keyword, display_count):
     if is_constants_available() == False:
         return
 
-    request.add_header("X-Naver-Client-Id", NAVER_CLIENT_ID)
-    request.add_header("X-Naver-Client-Secret", NAVER_CLIENT_SECRET)
+    request.add_header("X-Naver-Client-Id", NAVER_API_INFO.NAVER_CLIENT_ID)
+    request.add_header("X-Naver-Client-Secret", NAVER_API_INFO.NAVER_CLIENT_SECRET)
 
     response = urllib.request.urlopen(request)
     response_code = response.getcode()
@@ -241,8 +236,8 @@ def get_blog_post(search_blog_keyword, display_count, search_result_blog_page_co
 
         request = urllib.request.Request(url)
         
-        request.add_header("X-Naver-Client-Id", NAVER_CLIENT_ID)
-        request.add_header("X-Naver-Client-Secret", NAVER_CLIENT_SECRET)
+        request.add_header("X-Naver-Client-Id", NAVER_API_INFO.NAVER_CLIENT_ID)
+        request.add_header("X-Naver-Client-Secret", NAVER_API_INFO.NAVER_CLIENT_SECRET)
 
         response = urllib.request.urlopen(request)
         response_code = response.getcode()

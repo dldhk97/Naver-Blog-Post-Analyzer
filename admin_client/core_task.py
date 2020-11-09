@@ -1,18 +1,14 @@
 import requests, json
 import constants
 
-def load_module():
-    HOST_IP = constants.ServerInfo.CONNECTION_INFO['default']['HOST']
-    HOST_PORT = constants.ServerInfo.CONNECTION_INFO['default']['PORT']
-    
-    PARAMETER = 'request/admin/model/load'
+HOST_IP = constants.ServerInfo.CONNECTION_INFO['default']['HOST']
+HOST_PORT = constants.ServerInfo.CONNECTION_INFO['default']['PORT']
+HOST_URL_HEAD = 'http://' + HOST_IP + ':' + HOST_PORT
 
-    HOST_URL = 'http://' + HOST_IP + ':' + HOST_PORT + '/' + PARAMETER
+def authorization(admin_id, admin_pw):
+    HOST_URL = HOST_URL_HEAD + '/request/admin/test/authorization'
 
     try:
-        admin_id = input('ID:')
-        admin_pw = input('PW:')
-        
         data = {}
         data['id'] = admin_id
         data['pw'] = admin_pw
@@ -22,36 +18,69 @@ def load_module():
         response = requests.post(HOST_URL, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            json_array = json.loads(response.text)
-            print('hi')
-            pass
+            json_data = json.loads(response.text)
+            if json_data['success'] == 'True':
+                return True
+            else:    
+                print('[SERVER]', json_data['message'])
+                return False
+
+        print('[CLEINT][core_task] Response error occured')
     except Exception as e:
-        print('[SYSTEM][core_task]Failed to load_module.\n', e)
+        print('[CLEINT][core_task] Authorization exception occured.\n', e)
+
+def load_module():
+    HOST_URL = HOST_URL_HEAD + '/request/admin/model/load'
+
+    try:        
+        response = requests.get(HOST_URL)
+
+        if response.status_code == 200 or response.status_code == 200:
+            json_data = json.loads(response.text)
+            print('[SERVER]', json_data['message'])
+    except Exception as e:
+        print('[CLEINT][core_task]Failed to load_module.\n', e)
+
+def lorem_analyze():
+    HOST_URL = HOST_URL_HEAD + '/request/admin/test/lorem_analyze'
     
+    try:
+        # 현재 한 줄만 분석이 가능하므로, 여러 문장을 전송해도 한 문장만 분석합니다.
+        line_cnt = input('몇줄짜리 글입니까? : ')
+        print('글을 입력하세요 : ')
+        sents = ""
+        for s in range(int(line_cnt)):
+            sents += input() + '\n'
 
-def org_create_sent():
-    user_word = input('단어 입력 : ')
-    # created_sent = lorem_analyzer.org_craete_sent(user_word)
-    print('생성된 문장 : ')
-    # print(created_sent)
+        data = {}
+        data['sents'] = sents
+        
+        json_data = json.dumps(data)
+        
+        response = requests.post(HOST_URL, data=json_data)
 
-def get_distance():
-    user_sent = input('문장 입력 : ')
-    # distances = lorem_analyzer.get_distance(user_sent)
-    # mean, variance, standard_deviation = lorem_analyzer.distance_describe(distances)
+        if response.status_code == 200 or response.status_code == 200:
+            json_data = json.loads(response.text)
+            if json_data['success'] == 'True':
+                print('')
+                print('토큰 : ')
+                print(json_data['distances'])
+                print(json_data['tokens'])
+                print('평균값 : ' + json_data['mean'])
+                # 분산 내보기
+                print('분산 : ' + json_data['variance'])
+                # 표준편차 구하기
+                print('표준편차 : ' + json_data['standard_deviation'])
+                print('')
 
-    # distances_with_token = lorem_analyzer.distances_with_token(user_sent, distances)
-    print('')
-    print('토큰 : ')
-    # print(str(distances_with_token[0]))
-    # print(str(distances_with_token[1]))
-    # 평균값 내보기
-    # print('평균값 : ' + str(mean))
-    # 분산 내보기
-    # print('분산 : ' + str(variance))
-    # 표준편차 구하기
-    # print('표준편차 : ' + str(standard_deviation))
-    # print('')
+                return True
+            else:    
+                print('[SERVER]', json_data['message'])
+                return False
+
+        print('[CLEINT][core_task] Response error occured')
+    except Exception as e:
+        print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
 def crawl_by_search_word():
     search_word = input('검색어 : ')
