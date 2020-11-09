@@ -1,0 +1,8 @@
+# 서버에 접속하기 위한 상수 입력
+class ServerInfo(object):
+    CONNECTION_INFO = {
+        'default' : {
+            'HOST': '서버IP',
+            'PORT': '8080',
+        }
+    }

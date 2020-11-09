@@ -5,12 +5,10 @@
 import simple_cli
 
 def main_task():
-    # 서버 listening
+    exit_code = simple_cli.cli_loop()
 
-    # exit_code = simple_cli.cli_loop()
-
-    # if exit_code == 0:
-    #     print('정상적으로 종료합니다.')
+    if exit_code == 0:
+        print('정상적으로 종료합니다.')
     pass
 
 if __name__ == '__main__':

@@ -11,15 +11,14 @@ vocab = None
 tok = None
 
 def load_module():
-    print('[SYSTEM][Analyzer] Start loading module.')
     global model, vocab, tok
-    try:
-        tok_path = get_tokenizer()
+
+    if not model or not vocab:
         model, vocab = get_pytorch_kogpt2_model()
+
+    if not tok:
+        tok_path = get_tokenizer()
         tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
-        print('[SYSTEM][Analyzer] Load module successful.')
-    except Exception as e:
-        print('[SYSTEM][Analyzer] Failed to load module.', e)
 
 
 def org_craete_sent(sent):

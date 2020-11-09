@@ -1,7 +1,7 @@
 import sys, os
 
 from django.apps import AppConfig
-from .api.analyzer.lorem_analyzer import load_module
+from .api.model_task import load_module
 from .api.crawler.naverblogcrawler import init
 
 # 상위폴더의 모듈 임포트
