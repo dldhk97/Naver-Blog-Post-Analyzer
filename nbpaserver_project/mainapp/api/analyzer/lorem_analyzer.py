@@ -1,8 +1,8 @@
 import torch
 import numpy
-from kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
+from .kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
 from gluonnlp.data import SentencepieceTokenizer
-from kogpt2.utils import get_tokenizer
+from .kogpt2.utils import get_tokenizer
 
 MAX_WORD_LEN = 100	# 2번, 문장 생성 기능시 무한루프 방지용 최대단어개수
 
