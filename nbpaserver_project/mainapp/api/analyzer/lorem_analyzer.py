@@ -70,23 +70,20 @@ def get_distance(sentence):
         k = 10
         top_k = torch.topk(probs, k=k)
 
-        print(top_k)
+        # print(top_k)
         
         prob_arr = top_k[0]
         tok_arr = top_k[1]
 
         for i in range(k):
-            cur_tok_idx = tok_arr[0][0][i]
-            # cur_tok = vocab(cur_tok_idx)
-            prob_1 = prob_arr[0][0][i]
-            prob_2 = prob_arr[0][1][i]
+            cur_tok_idx = tok_arr[0][cnt][i]
+            
+            prob_1 = prob_arr[0][cnt][i].item()
 
             if cur_tok_idx == vocab[word]:
                 print(word)
-                print(prob_1)
-                print(prob_2)
+                print(prob_1 * k)
                 break
-            pass
 
 
         # # 연관성이 높은 순으로 vocab을 뒤지는데, 다음 녀석이 존재하는지 찾는다.
