@@ -12,7 +12,6 @@ Django 서버와 관리자용 콘솔 클라이언트로 구성되어 있습니�
 python -m pip install -r .\requirements.txt
 
 # torch 설치(gpu/cpu 선택적 설치)
-
 # cuda 사용
 python -m pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 # cpu 사용
@@ -22,7 +21,8 @@ python -m pip install torch==1.5.1+cpu -f https://download.pytorch.org/whl/torch
 nbpaserver_project\constants.py.bak을 참고하여 constants.py 생성
 admin_client\constants.py.bak을 참고하여 constatns.py 생성
 
-# DB 스키마가 없는 경우 DB구축
+# DB가 구축되지 않은 경우 DB 스키마를 생성한 후 아래 코드 실행.
+# DB 테이블 구축
 python .\nbpaserver_project\manage.py makemigrations
 python .\nbpaserver_project\manage.py migrate
 
