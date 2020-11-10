@@ -83,7 +83,7 @@ def get_distance(sentence):
 
             if cur_tok_idx == vocab[word]:
                 print(word)
-                print(prob_1)
+                print(format(prob_1, "10.6%"))
                 did_you_find = True
                 break
 
