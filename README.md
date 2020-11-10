@@ -18,25 +18,9 @@ python -m pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/tor
 # cpu 사용
 python -m pip install torch==1.5.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
-# constants.py 생성 (constants.py.bak을 constants.py로 바꾸거나 복사)
-copy constants.py.bak constants.py
-
-# constants.py 수정 (NaverAPI)
-class NaverAPI(object):
-    NAVER_CLIENT_ID = '네이버 API ID'
-    NAVER_CLIENT_SECRET = '네이버 API SECRET'
-
-class DBInfo(object):
-    DATABASE_INFO = {
-        'default' : {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'DB 스키마 이름',
-            'USER': '유저 이름',
-            'PASSWORD': '패스워드',
-            'HOST': '주소',
-            'PORT': '포트',
-        }
-    }
+# 서버의 constants.py와 Admin Client의 constants.py 생성
+nbpaserver_project\constants.py.bak을 참고하여 constants.py 생성
+admin_client\constants.py.bak을 참고하여 constatns.py 생성
 
 # DB 스키마가 없는 경우 DB구축
 python .\nbpaserver_project\manage.py makemigrations
