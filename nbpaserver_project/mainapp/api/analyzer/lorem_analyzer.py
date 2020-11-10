@@ -59,7 +59,7 @@ def get_distance(sentence):
     distance_list = []
     splited = tok(sentence)
     toked = splited[:1]   # 첫 녀석을 일단 토큰화
-    # print(toked)
+    print(toked)
 
     # 두번째 녀석부터 한번씩 word 변수에 담아 반복
     for word in splited[1:]:
@@ -67,7 +67,7 @@ def get_distance(sentence):
         pred = model(input_ids)[0]
         
         probs = torch.nn.functional.softmax(pred, dim=-1)
-        k = 10
+        k = 50000
         top_k = torch.topk(probs, k=k)
 
         # print(top_k)
@@ -75,6 +75,7 @@ def get_distance(sentence):
         prob_arr = top_k[0]
         tok_arr = top_k[1]
 
+        did_you_find = False
         for i in range(k):
             cur_tok_idx = tok_arr[0][cnt][i]
             
@@ -82,8 +83,12 @@ def get_distance(sentence):
 
             if cur_tok_idx == vocab[word]:
                 print(word)
-                print(prob_1 * k)
+                print(prob_1)
+                did_you_find = True
                 break
+
+        if not did_you_find:
+            print('I cant find. ' + word)
 
 
         # # 연관성이 높은 순으로 vocab을 뒤지는데, 다음 녀석이 존재하는지 찾는다.
