@@ -4,6 +4,9 @@ from .kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
 from gluonnlp.data import SentencepieceTokenizer
 from .kogpt2.utils import get_tokenizer
 
+from sklearn.preprocessing import MinMaxScaler
+
+
 MAX_WORD_LEN = 100	# 2번, 문장 생성 기능시 무한루프 방지용 최대단어개수
 
 model = None
@@ -62,18 +65,46 @@ def get_distance(sentence):
     for word in splited[1:]:
         input_ids = torch.tensor([vocab[vocab.bos_token],]  + vocab[toked]).unsqueeze(0)  # 예측
         pred = model(input_ids)[0]
+        
+        probs = torch.nn.functional.softmax(pred, dim=-1)
+        k = 10
+        top_k = torch.topk(probs, k=k)
 
-        # 연관성이 높은 순으로 vocab을 뒤지는데, 다음 녀석이 존재하는지 찾는다.
-        distance = 0
-        # print(torch.argsort(pred, axis=-1, descending=True)[0])
-        for vocab_idx in torch.argsort(pred, axis=-1, descending=True)[0][cnt]:
-            # 연관성 순 인덱스와, 다음 단어의 인덱스가 같다면, 거리(1위로 부터의 거리)를 구하고 반복 종료
-            if vocab_idx == vocab[word]:
-                # print(word + ' of distance : ' + str(distance))
-                # print(vocab_idx)
-                distance_list.append(distance)
+        print(top_k)
+        
+        prob_arr = top_k[0]
+        tok_arr = top_k[1]
+
+        for i in range(k):
+            cur_tok_idx = tok_arr[0][0][i]
+            # cur_tok = vocab(cur_tok_idx)
+            prob_1 = prob_arr[0][0][i]
+            prob_2 = prob_arr[0][1][i]
+
+            if cur_tok_idx == vocab[word]:
+                print(word)
+                print(prob_1)
+                print(prob_2)
                 break
-            distance += 1   # 두 인덱스가 다르면 거리 +1
+            pass
+
+
+        # # 연관성이 높은 순으로 vocab을 뒤지는데, 다음 녀석이 존재하는지 찾는다.
+        # distance = 0
+        # ye1 = vocab.idx_to_token[3918]
+        # yey = vocab.idx_to_token[104]
+        # # print(torch.argsort(pred, axis=-1, descending=True)[0])
+        
+        # for vocab_idx in torch.argsort(pred, axis=-1, descending=True)[0][cnt]:
+        #     # 연관성 순 인덱스와, 다음 단어의 인덱스가 같다면, 거리(1위로 부터의 거리)를 구하고 반복 종료
+        #     print(vocab_idx)
+        #     if vocab_idx == vocab[word]:
+        #         # print(word + ' of distance : ' + str(distance))
+                
+        #         distance_list.append(distance)
+        #         break
+        #     distance += 1   # 두 인덱스가 다르면 거리 +1
+        
         cnt += 1          # 다음 단어를 분석하기위해 cnt +1
 
         toked = splited[:cnt] # 분석할 문장에 다음 단어를 추가한다. (단지 -> 단지 이번에는)

@@ -16,7 +16,7 @@ class MainappConfig(AppConfig):
     # startup code
     def ready(self):
         print('[SYSTEM][MainappConfig] Run startup code')
-        # load_module()
+        load_module()
         naverblogcrawler.init(constants.NaverAPI)
         auth_task.init(constants.AdminAccountInfo)
 
