@@ -21,11 +21,21 @@ python -m pip install torch==1.5.1+cpu -f https://download.pytorch.org/whl/torch
 nbpaserver_project\constants.py.bak을 참고하여 constants.py 생성
 admin_client\constants.py.bak을 참고하여 constatns.py 생성
 
-# DB가 구축되지 않은 경우 DB 스키마를 생성한 후 아래 코드 실행.
+#---------------DB가 구축되지 않은 경우---------------
+
+# DB 스키마를 생성한 후 아래 코드 실행.
 # DB 테이블 구축
 python .\nbpaserver_project\manage.py makemigrations
 python .\nbpaserver_project\manage.py migrate
 
 # Django 관리자 계정 생성
 python .\nbpaserver_project\manage.py createsuperuser
+
+#---------------실행---------------
+
+# 서버 실행
+python .\nbpaserver_project\manage.py runserver 8080 --noreload
+
+# 관리자 클라이언트 실행
+python .\admin_client\main.py
 ```
