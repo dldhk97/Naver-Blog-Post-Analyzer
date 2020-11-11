@@ -3,10 +3,10 @@ import constants
 
 HOST_IP = constants.ServerInfo.CONNECTION_INFO['default']['HOST']
 HOST_PORT = constants.ServerInfo.CONNECTION_INFO['default']['PORT']
-HOST_URL_HEAD = 'http://' + HOST_IP + ':' + HOST_PORT
+HOST_URL_HEAD = 'http://' + HOST_IP + ':' + HOST_PORT + '/request/'
 
 def authorization(admin_id, admin_pw):
-    HOST_URL = HOST_URL_HEAD + '/request/admin/test/authorization'
+    url = HOST_URL_HEAD + 'admin/test/authorization'
 
     try:
         data = {}
@@ -15,9 +15,9 @@ def authorization(admin_id, admin_pw):
         
         json_data = json.dumps(data)
         
-        response = requests.post(HOST_URL, data=json_data)
+        response = requests.post(url, data=json_data)
 
-        if response.status_code == 200 or response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             json_data = json.loads(response.text)
             if json_data['success'] == 'True':
                 return True
@@ -25,24 +25,27 @@ def authorization(admin_id, admin_pw):
                 print('[SERVER]', json_data['message'])
                 return False
 
-        print('[CLEINT][core_task] Response error occured')
+        print('[CLEINT][core_task] Authorization failed! Status_code is not 200 or 201!')
     except Exception as e:
-        print('[CLEINT][core_task] Authorization exception occured.\n', e)
+        print('[CLEINT][core_task] Exception occured at authorization\n', e)
 
 def load_module():
-    HOST_URL = HOST_URL_HEAD + '/request/admin/model/load'
+    url = HOST_URL_HEAD + 'admin/model/load'
 
     try:        
-        response = requests.get(HOST_URL)
+        response = requests.get(url)
 
-        if response.status_code == 200 or response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             json_data = json.loads(response.text)
             print('[SERVER]', json_data['message'])
+            return True
+
+        print('[CLEINT][core_task] Load_module failed! Status_code is not 200 or 201!')
     except Exception as e:
-        print('[CLEINT][core_task]Failed to load_module.\n', e)
+        print('[CLEINT][core_task] Failed to load_module.\n', e)
 
 def lorem_analyze():
-    HOST_URL = HOST_URL_HEAD + '/request/admin/test/lorem_analyze'
+    url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
     
     try:
         # 현재 한 줄만 분석이 가능하므로, 여러 문장을 전송해도 한 문장만 분석합니다.
@@ -57,7 +60,7 @@ def lorem_analyze():
         
         json_data = json.dumps(data)
         
-        response = requests.post(HOST_URL, data=json_data)
+        response = requests.post(url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
             json_data = json.loads(response.text)
@@ -78,24 +81,43 @@ def lorem_analyze():
                 print('[SERVER]', json_data['message'])
                 return False
 
-        print('[CLEINT][core_task] Response error occured')
+        print('[CLEINT][core_task] Lorem_analyze error occured! Status_code is not 200 or 201!')
     except Exception as e:
         print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
 def crawl_by_search_word():
-    search_word = input('검색어 : ')
-    if search_word is not None:
+    url = HOST_URL_HEAD + 'admin/test/crawlbysearchword'
+
+    try:
+        search_word = input('검색어 : ')
+        if search_word is None:
+            print('검색어가 올바르지 않습니다.')
+            return
+
         blog_post_count = input('크롤링할 포스트의 개수 : ')
-        try:
-            if blog_post_count.isdigit:
-                # naver_blog_post_crawler.crawl_by_search_word(search_word, int(blog_post_count))
-                pass 
-            else:
-                print('크롤링할 포스트의 개수가 올바르지 않습니다.')
-        except Exception as e:
-            print(e)
-    else:
-        print('검색어가 올바르지 않습니다.')
+        if not blog_post_count.isdigit:
+            print('크롤링할 포스트의 개수가 올바르지 않습니다.')
+            return
+
+        data = {}
+        data['search_word'] = search_word
+        data['blog_post_count'] = blog_post_count
+        
+        json_data = json.dumps(data)
+        
+        response = requests.post(url, data=json_data)
+        
+        if response.status_code == 200 or response.status_code == 200:
+            json_data = json.loads(response.text)
+            if json_data['success'] == 'True':
+                pass
+            else:    
+                print('[SERVER]', json_data['message'])
+
+        print('[CLEINT][core_task] Crawl_by_search_word error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] Crawl_by_search_word exception occured.\n', e)
+        
 
 def crawl_single_post():
     url = input('URL : ')
@@ -122,6 +144,74 @@ def crawl_multimedia():
     else:
         print('URL이 올바르지 않습니다.')
 
-def test_db_connection():
-    # db_connector.test_connection()
+def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords):
+    blog_info = blog_info['fields']
+    print(blog_info)
+
+    analyzed_info = analyzed_info['fields']
+    print(analyzed_info)
+
+    for multimedia_ratio in multimedia_ratios:
+        mr = multimedia_ratio['fields']
+        print(mr)
+
+    for tag in tags:
+        t = tag['fields']
+        print(t)
+
+    for hyperlink in hyperlinks:
+        h = hyperlink['fields']
+        print(h)
+
+    for keyword in keywords:
+        k = keyword['fields']
+        print(k)
+
     pass
+
+def get_analyzed_info():
+    url = HOST_URL_HEAD + 'admin/test/getanalyzedinfo'
+    
+    try:
+        # url 목록 전송
+        line_cnt = input('url의 개수는? : ')
+
+        print('url : ')
+        data_list = []
+
+        for _ in range(int(line_cnt)):
+            data = {}
+            data['url'] = input()
+            data_list.append(data)
+        
+        json_data = json.dumps(data_list)
+        
+        response = requests.post(url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            blog_entire_info_arr = json.loads(response.text)
+
+            header_data = blog_entire_info_arr[0]
+                
+            if header_data['success'] == 'True':
+                
+                for info in blog_entire_info_arr[1:]:
+                    blog_info = json.loads(info['blog_info'])[0]
+                    analyzed_info = json.loads(info['analyzed_info'])[0]
+                    multimedia_ratios = json.loads(info['multimedia_ratios'])
+                    
+                    tags = json.loads(info['tags'])
+                    hyperlinks = json.loads(info['hyperlinks'])
+                    keywords = json.loads(info['keywords'])
+                    
+                    print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords)
+                    
+
+                return True
+            else:    
+                print('[SERVER]', header_data['message'])
+                return False
+
+        print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)

@@ -20,7 +20,7 @@ def get_analyzed_info(request):
         result = core_task.get_analyzed_info(json_array)
 
         # send data to client 
-        return JsonResponse(result)
+        return JsonResponse(result, safe=False)
     
     print('[SYSTEM]Do not handle get request.')
     pass
@@ -112,6 +112,17 @@ def lorem_analyze(request):
     print('[SYSTEM]Do not handle get request.')
     pass
 
+@method_decorator(csrf_exempt, name='dispatch')
+def crawl_by_search_word(request):
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+
+        analyzed_data = test_task.crawl_by_search_word()
+
+        return JsonResponse(analyzed_data)
+    
+    print('[SYSTEM]Do not handle get request.')
+    pass
 
 @method_decorator(csrf_exempt, name='dispatch')
 def crawl_single_blog(request):

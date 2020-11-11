@@ -2,7 +2,7 @@ import sys, os
 
 from django.apps import AppConfig
 from .api.model_task import load_module
-from .api.crawler import naverblogcrawler
+from .api.crawler import naverblogcrawler, multimediacrawler
 from .api import auth_task
 
 # 상위폴더의 모듈 임포트
@@ -16,8 +16,14 @@ class MainappConfig(AppConfig):
     # startup code
     def ready(self):
         print('[SYSTEM][MainappConfig] Run startup code')
-        load_module()
+        
+        # 상수 전달
         naverblogcrawler.init(constants.NaverAPI)
         auth_task.init(constants.AdminAccountInfo)
+        
+        # KoGPT2 모듈 로드
+        # load_module()
+        # 셀레니움 준비
+        # multimediacrawler.prepare_selenium()
 
         print('[SYSTEM][MainappConfig] Startup code completed!')

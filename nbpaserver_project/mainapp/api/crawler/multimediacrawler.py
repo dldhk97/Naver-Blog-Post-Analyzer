@@ -1,9 +1,11 @@
 import os, platform, time
 import string
+
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from . import naverblogcrawler
 from . import multimedia
+
 
 # 설치되어있는 크롬의 버전에 맞는 드라이버를 사용하십시오.
 driver = None
@@ -22,7 +24,7 @@ def prepare_selenium():
         print('Platform is Windows')
         driver_name = 'chromedriver85_win.exe'
     
-    driver_path = os.getcwd() + os.sep + 'bin' + os.sep + driver_name
+    driver_path = os.getcwd() + os.sep + 'nbpaserver_project' + os.sep + 'mainapp' + os.sep + 'api' + os.sep + 'crawler' + os.sep + 'bin' + os.sep + driver_name
 
     print('Using this driver : ' + driver_path)
 
@@ -274,7 +276,8 @@ def get_multimedia(blog_post_url):
         blanks_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
 
         # 이미지, 이모티콘, 비디오, 하이퍼링크, 기타(iframe), 텍스트, 공백 비율 반환
-        return entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, blanks_ratio
+        result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, blanks_ratio]
+        return result_arr
 
     except Exception as e:
         print('Multimedia parse failed : ')

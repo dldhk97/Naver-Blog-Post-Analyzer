@@ -7,7 +7,7 @@ def print_menu():
     print('3. 검색어로 크롤링하기')
     print('4. URL로 한 게시글 크롤링하기')
     print('5. URL로 한 게시글 멀티미디어 크롤링하기')
-    print('6. DB 연결 테스트')
+    print('6. url 전송하여 분석결과 반환')
     print('q. 종료')
 
 
@@ -31,7 +31,7 @@ def cli_loop():
             core_task.crawl_multimedia()
 
         elif user_input == '6':
-            core_task.test_db_connection()
+            core_task.get_analyzed_info()
 
         elif user_input == 'q':
             return 0

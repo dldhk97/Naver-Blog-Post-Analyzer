@@ -52,11 +52,11 @@ def get_distance(sentence):
     global model, vocab, tok
 
     if model is None:
-        print('[SYSTEM][Analyzer] Load module before use gpt2.')
-        return None
+        load_module()
 
     cnt = 1
-    distance_list = []
+    result_tok_list = []
+    result_prob_list = []
     splited = tok(sentence)
     toked = splited[:1]   # 첫 녀석을 일단 토큰화
     print(toked)
@@ -79,11 +79,15 @@ def get_distance(sentence):
         for i in range(k):
             cur_tok_idx = tok_arr[0][cnt][i]
             
-            prob_1 = prob_arr[0][cnt][i].item()
+            prob = prob_arr[0][cnt][i].item()
 
             if cur_tok_idx == vocab[word]:
                 print(word)
-                print(format(prob_1, "10.6%"))
+                print(format(prob, "10.6%"))
+
+                result_tok_list.append(word)
+                result_prob_list.append(prob)
+                
                 did_you_find = True
                 break
 
@@ -112,7 +116,7 @@ def get_distance(sentence):
         toked = splited[:cnt] # 분석할 문장에 다음 단어를 추가한다. (단지 -> 단지 이번에는)
         # print(toked)
 
-    return distance_list  # 거리가 저장된 배열 반환
+    return result_tok_list, result_prob_list  # 거리가 저장된 배열 반환
 
 # 거리 배열, 평균값, 분산, 표준편차 내기
 def distance_describe(distances):

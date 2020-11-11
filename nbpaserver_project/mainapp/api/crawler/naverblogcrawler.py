@@ -124,7 +124,7 @@ def parse_entire_body(content):
     # result = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', result)
     
     # 이스케이프 문자 다 띄어쓰기로 변경
-    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', ' ', result)
+    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '\n', result)
 
     # 줄바꿈 문자 처리
     result = re.sub(r'\n+', '\n', result)
