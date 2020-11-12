@@ -229,6 +229,11 @@ def get_multimedia(blog_post_url):
         print(blog_post_url + ' 는 네이버 블로그가 아니라 패스합니다')
         return
 
+    # 모바일 페이지는 일반페이지로 변경
+    if 'm.blog.naver.com' in blog_post_url:
+        print('[SYSTEM][crawler][multimediacrawler] ' + blog_post_url + 'seems mobile page. Try to convert non-mobile page.')
+        blog_post_url = blog_post_url.replace('m.blog.naver.com', 'blog.naver.com')
+
     try:
         if driver is None:
             # 셀레니움 드라이버 준비
@@ -276,7 +281,7 @@ def get_multimedia(blog_post_url):
         blanks_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
 
         # 이미지, 이모티콘, 비디오, 하이퍼링크, 기타(iframe), 텍스트, 공백 비율 반환
-        result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_etcs_ratio, entire_texts_ratio, blanks_ratio]
+        result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_texts_ratio, blanks_ratio, entire_etcs_ratio]
         return result_arr
 
     except Exception as e:

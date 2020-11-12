@@ -63,6 +63,8 @@ def get_analyzed_info(json_array):
                     hyperlink.save()
                 for tag in tag_dicts:
                     tag.save()
+                # for keyword in keyword_dicts:
+                #     keyword.save()
                 print('[SYSTEM][core_task] BlogInfo(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
             else:
                 # DB에 BlogInfo가 존재하면 태그, 하이퍼링크, 키워드 가져옴

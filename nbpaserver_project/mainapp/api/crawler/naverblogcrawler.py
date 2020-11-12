@@ -152,6 +152,10 @@ def parse_hyperlinks(content):
 
 # 일반 url을 주면 blogId, logNo가 포함된 자세한 URL을 반환
 def parse_real_blog_post_url(blog_post_url):
+    if 'm.blog.naver.com' in blog_post_url:
+        print('[SYSTEM][crawler][naverblogcrawler] ' + blog_post_url + 'seems mobile page. Try to convert non-mobile page.')
+        blog_post_url = blog_post_url.replace('m.blog.naver.com', 'blog.naver.com')
+
     get_blog_post_content_code = requests.get(blog_post_url)
     get_blog_post_content_text = get_blog_post_content_code.text
 
