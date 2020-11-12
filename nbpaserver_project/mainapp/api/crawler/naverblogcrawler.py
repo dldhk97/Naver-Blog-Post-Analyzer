@@ -118,13 +118,26 @@ def parse_blog_id(url):
 
 # 본문 텍스트 추출
 def parse_entire_body(content):
-    result = str(content.get_text())
+    # 자동으로 get_text로 파싱하는 경우 개행문자가 잘 처리되지 않음.
+    # 그래서 try로 수동 html 파싱으로 개행문자를 잘 잡아보려고 했음.
+    # 이 경우 html 구조가 바뀌면 터질 위험이 높기에, 터지는 경우 get_text()로 그냥 통짜로 텍스트 긁어서 처리함.
+
+    try:
+        result = ""
+        for elem in content:
+            if 'Tag' in str(type(elem)):
+                result += elem.get_text() + '\n'
+            elif 'String' in str(type(elem)):
+                result += str(elem) + '\n'
+    except Exception as e:
+        result = str(content.get_text())
+        print('[naverblogcralwer] Failed to manual html parse while parse_entire_body\n', e)
 
     # 특수 공백 및 개행문자 정리
     # result = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', result)
     
     # 이스케이프 문자 다 띄어쓰기로 변경
-    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '\n', result)
+    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF|\xa0)+', '\n', result)
 
     # 줄바꿈 문자 처리
     result = re.sub(r'\n+', '\n', result)
@@ -135,6 +148,9 @@ def parse_entire_body(content):
     result = re.sub(r'( |\t|\xa0)+', ' ', result)
 
     return result.strip()
+        
+            
+
 
 
 # 하이퍼링크 목록을 반환

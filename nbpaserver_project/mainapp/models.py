@@ -34,7 +34,7 @@ class AnalyzedInfo(models.Model):
 class MultimediaRatio(models.Model):
     multimedia_ratio_id = models.AutoField(primary_key=True)
     ratio_type = models.ForeignKey('RatioType', on_delete=models.PROTECT)
-    analyzed_info = models.ForeignKey(AnalyzedInfo, on_delete=models.CASCADE)
+    blog_info = models.ForeignKey(BlogInfo, on_delete=models.CASCADE)
     
     ratio = models.FloatField(default=-1)
 
@@ -43,7 +43,7 @@ class MultimediaRatio(models.Model):
 
     def __str__(self):
         id = str(self.multimedia_ratio_id if self.multimedia_ratio_id else '')
-        return id + ', ' + str(self.ratio_type.name) + ', ' + str(self.analyzed_info.analyzed_info_id) + ', ' + str(self.ratio)
+        return id + ', ' + str(self.ratio_type.name) + ', ' + str(self.blog_info.blog_id) + ', ' + str(self.ratio)
 
 class Dictionary(models.Model):
     dictionary_id = models.AutoField(primary_key=True)

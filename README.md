@@ -26,6 +26,7 @@ admin_client\constants.py.bak을 참고하여 constatns.py 생성
 # DB 스키마를 생성한 후 아래 코드 실행.
 # DB 테이블 구축
 python .\nbpaserver_project\manage.py makemigrations
+python .\nbpaserver_project\manage.py makemigrations mainapp
 python .\nbpaserver_project\manage.py migrate
 
 # Django 관리자 계정 생성

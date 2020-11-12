@@ -38,6 +38,14 @@ def get_analyzed_info(json_array):
         try:
             target_url = json_obj['url']
 
+            # 블로그 게시글이 아니면 패스
+            if 'blog.naver.com' not in target_url:
+                continue
+
+            # 모바일 페이지면 일반 페이지로 url 변경
+            if 'm.blog.naver.com' in target_url:
+                target_url = target_url.replace('m.blog.naver.com', 'blog.naver.com')
+                
             # url에서 blog_id와 log_no 추출
             parsed_blog_id, parsed_log_no = parse_blog_identifiers(target_url)
             
@@ -141,7 +149,7 @@ def get_analyzed_info(json_array):
                 analyzed_info = analyzedinfo_arr[0]
                 
             # DB에서 멀티미디어 정보가 있는지 검사한다.
-            multimedia_ratios = models.MultimediaRatio.objects.filter(analyzed_info=analyzed_info)
+            multimedia_ratios = models.MultimediaRatio.objects.filter(blog_info=blog_info)
 
             # 멀티미디어 정보가 없으면 멀티미디어 정보 분석한다.
             if len(multimedia_ratios) <= 0:
@@ -156,7 +164,7 @@ def get_analyzed_info(json_array):
                 for i in range(len(crawled_multimedia_ratios)):
                     if crawled_multimedia_ratios[i]:
                         multimedia_ratio = models.MultimediaRatio()
-                        multimedia_ratio.analyzed_info = analyzed_info
+                        multimedia_ratio.blog_info = blog_info
                         multimedia_ratio.ratio = crawled_multimedia_ratios[i]
                         
                         ratio_type = models.RatioType.objects.filter(name=ratio_type_name_arr[i])[0]

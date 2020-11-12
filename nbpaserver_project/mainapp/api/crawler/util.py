@@ -41,6 +41,8 @@ def blog_post_to_model(blog_post):
         return blog_info, hyperlink_dict, tag_dict
     except Exception as e:
         print('[SYSTEM][crawler_util] Failed to convert blog_post to blog_info, dictionarys\n' + blog_info.title + ', ' + blog_info.url, e)
+        if 'list index out of range' in e.args[0]:
+            print('[CRITICAL_ERROR][DB] Is dictionaryType table empty? Check the type tables.')
         
     return None, None, None
 
