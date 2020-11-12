@@ -6,7 +6,9 @@ from django.core import serializers
 from .. import models
 from .crawler.util import crawl_single_post, blog_post_to_model
 from .analyzer.lorem_analyzer import get_distance, distance_describe
+from .analyzer.Keyword_Extractor import analyze_keywords
 from .crawler import multimediacrawler
+
 
 # 파라미터가 없는 url에서 blog_id, log_no 추출하기
 def parse_blog_identifiers(url):
@@ -54,18 +56,17 @@ def get_analyzed_info(json_array):
                 # 크롤러의 blog_post 객체를 BlogInfo 객체와 2개의 dictionary 객체배열로 변환함.
                 blog_info, hyperlink_dicts, tag_dicts = blog_post_to_model(blog_post)
 
-                # TODO: 여기서 키워드 분석도 진행을 한다.(코드 고치기 바람.)
-                keyword_dicts = []
-
                 # DB에 저장
                 blog_info.save()
+                print('[SYSTEM][core_task] BlogInfo(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
+
                 for hyperlink in hyperlink_dicts:
                     hyperlink.save()
+                print('[SYSTEM][core_task] hyperlink_dicts(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
+
                 for tag in tag_dicts:
                     tag.save()
-                # for keyword in keyword_dicts:
-                #     keyword.save()
-                print('[SYSTEM][core_task] BlogInfo(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
+                print('[SYSTEM][core_task] tag_dicts(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
             else:
                 # DB에 BlogInfo가 존재하면 태그, 하이퍼링크, 키워드 가져옴
                 blog_info = bloginfo_arr[0]
@@ -75,14 +76,33 @@ def get_analyzed_info(json_array):
 
                 dict_type_hyperlink = models.DictionaryType.objects.filter(name='hyperlink')[0]
                 hyperlink_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_hyperlink)
-
-                dict_type_keyword = models.DictionaryType.objects.filter(name='keyword')[0]
-                keyword_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_keyword)
             
             ###
             # 여기부턴 처리가 오래걸려서, 느리면 스레드 나누던지 해야할듯? 키워드 추출 알고리즘 & 로렘분석 & 멀티미디어 분석이 필요함.
             # 너무 코드가 길다. 함수로 나누자. 끔찍한 코드가 만들어지고 있음.
             ###
+
+            # 키워드가 DB에 존재하는지 체크함.
+            dict_type_keyword = models.DictionaryType.objects.filter(name='keyword')[0]
+            keyword_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_keyword)
+
+            # 키워드가 없으면 분석 시도
+            if len(keyword_dicts) <= 0:
+                keyword_dicts = []
+                print('[SYSTEM][core_task] keyword_dicts(' + parsed_blog_id +', ' + parsed_log_no + ') does not exists in database!')
+                keywords = analyze_keywords(blog_info.body, top_k=20)
+                for k in keywords:
+                    keyword = models.Dictionary()
+                    keyword.blog_info = blog_info
+                    keyword.dictionary_type = models.DictionaryType.objects.filter(name='keyword')[0]
+                    keyword.word = k[0]         # 단어/형태 모양으로 들어감
+                    keyword_dicts.append(keyword)
+
+                # 따로 for문 도는 이유는 키워드 목록이 만들어지는 도중에 터지면, 아예 DB에 저장하지 않게 하기 위함.
+                for k in keyword_dicts:
+                    k.save()
+
+                print('[SYSTEM][core_task] keyword_dicts(' + parsed_blog_id +', ' + parsed_log_no + ') saved in database!')
 
             # DB에서 분석 정보가 있는지 검사한다.
             analyzedinfo_arr = models.AnalyzedInfo.objects.filter(blog_info=blog_info)
