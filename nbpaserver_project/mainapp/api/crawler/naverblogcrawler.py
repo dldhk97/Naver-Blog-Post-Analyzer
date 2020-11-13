@@ -4,8 +4,9 @@ import requests
 import urllib.request
 import urllib.error
 import urllib.parse
+
+from . import blogpost, util
 from bs4 import BeautifulSoup
-from . import blogpost
 
 NAVER_API_INFO = None
 
@@ -132,9 +133,6 @@ def parse_entire_body(content):
     except Exception as e:
         result = str(content.get_text())
         print('[naverblogcralwer] Failed to manual html parse while parse_entire_body\n', e)
-
-    # 특수 공백 및 개행문자 정리
-    # result = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', result)
     
     # 이스케이프 문자 다 띄어쓰기로 변경
     result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF|\xa0)+', '\n', result)
@@ -150,9 +148,6 @@ def parse_entire_body(content):
     return result.strip()
         
             
-
-
-
 # 하이퍼링크 목록을 반환
 def parse_hyperlinks(content):
     try:
@@ -160,29 +155,14 @@ def parse_hyperlinks(content):
         for node in content.find_all('a', href=True):
             if node['href'] != '#':
                 hyperlink = node['href']
-                result.append(hyperlink)
+                
+                # 중복 체크하고 리스트에 추가
+                if hyperlink not in result:
+                    result.append(hyperlink)
+                        
         return result
     except Exception as e:
         print('[parse_hyperlinks] ERROR : ' , e)
-
-
-# 일반 url을 주면 blogId, logNo가 포함된 자세한 URL을 반환
-def parse_real_blog_post_url(blog_post_url):
-    if 'm.blog.naver.com' in blog_post_url:
-        print('[SYSTEM][crawler][naverblogcrawler] ' + blog_post_url + 'seems mobile page. Try to convert non-mobile page.')
-        blog_post_url = blog_post_url.replace('m.blog.naver.com', 'blog.naver.com')
-
-    get_blog_post_content_code = requests.get(blog_post_url)
-    get_blog_post_content_text = get_blog_post_content_code.text
-
-    get_blog_post_content_soup = BeautifulSoup(get_blog_post_content_text, 'lxml')
-
-    for link in get_blog_post_content_soup.select('iframe#mainFrame'):
-        real_blog_post_url = "http://blog.naver.com" + link.get('src')
-        return real_blog_post_url
-
-    # 이미 리얼 블로그 url인 경우 그대로 반환
-    return blog_post_url
 
 # 리얼 URL을 주면 전체 html 반환
 def parse_entire_blog_post(real_blog_post_url):
@@ -205,16 +185,17 @@ def pasre_blog_post(blog_post_url, api_response_item=None):
     # 네이버 블로그인 경우만 처리함.
     if 'blog.naver.com' in blog_post_url:
 
-        real_blog_post_url = parse_real_blog_post_url(blog_post_url)
+        # 모바일이든, 일반url이든 postView url로 변경
+        post_view_url = util.url_normalization(blog_post_url)
 
-        get_real_blog_post_content_soup = parse_entire_blog_post(real_blog_post_url)
+        # url로부터 블로그의 id와 게시물의 id(log_no)를 추출함.
+        blog_id, log_no = util.get_post_identifier_from_url(post_view_url)
 
-        # 본문과 태그의 부모 div의 id를 특정함
-        log_no = parse_log_no(real_blog_post_url)
-        body_identifier = parse_body_identifier(log_no)
+        # bs4로 html 파싱
+        get_real_blog_post_content_soup = parse_entire_blog_post(post_view_url)
         
-        # blogId 구하기(blogId + log_no로 URL이 없어도 만들어낼 수 있어서 추출하여 저장함)
-        blog_id = parse_blog_id(real_blog_post_url)
+        # 본문과 태그의 부모 div의 id를 특정함
+        body_identifier = parse_body_identifier(log_no)
 
         for blog_post_content in get_real_blog_post_content_soup.select(body_identifier):
             main_content = parse_main_content(blog_post_content)
@@ -238,8 +219,7 @@ def pasre_blog_post(blog_post_url, api_response_item=None):
             hyperlinks = parse_hyperlinks(main_content)       # 하이퍼링크 목록 추출
             tags = parse_tags(blog_id, log_no)                # 태그 추출(태그는 레이지로딩인거같아 파싱 불가. Json으로 따로 추출)
 
-            current_blog_post = blogpost.BlogPost(blog_id, log_no, blog_post_url, title, description, date, blog_name, hyperlinks, tags, body)
-            return current_blog_post
+            return  blogpost.BlogPost(blog_id, log_no, blog_post_url, title, description, date, blog_name, hyperlinks, tags, body)
     else:
         print(blog_post_url + ' 는 네이버 블로그가 아니라 패스합니다')
 

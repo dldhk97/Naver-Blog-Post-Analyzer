@@ -3,8 +3,7 @@ import string
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
-from . import naverblogcrawler
-from . import multimedia
+from . import naverblogcrawler, multimedia, util
 
 
 # 설치되어있는 크롬의 버전에 맞는 드라이버를 사용하십시오.
@@ -30,7 +29,7 @@ def prepare_selenium():
 
     driver = webdriver.Chrome(executable_path=driver_path, chrome_options=options)
     
-    driver.implicitly_wait(3)
+    driver.implicitly_wait(5)
 
 # 이미지 목록과 이모티콘 목록을 반환
 def parse_images(blog_post_content):
@@ -229,24 +228,19 @@ def get_multimedia(blog_post_url):
         print(blog_post_url + ' 는 네이버 블로그가 아니라 패스합니다')
         return
 
-    # 모바일 페이지는 일반페이지로 변경
-    if 'm.blog.naver.com' in blog_post_url:
-        print('[SYSTEM][crawler][multimediacrawler] ' + blog_post_url + 'seems mobile page. Try to convert non-mobile page.')
-        blog_post_url = blog_post_url.replace('m.blog.naver.com', 'blog.naver.com')
-
     try:
         if driver is None:
             # 셀레니움 드라이버 준비
             prepare_selenium()
 
-        # 일반 url에서 bs4로 log_no, blog_id가 포함된 real_blog_post_url을 추출
-        real_blog_post_url = naverblogcrawler.parse_real_blog_post_url(blog_post_url)
+        # 일반 url에서 bs4로 log_no, blog_id가 포함된 post_view_url 추출
+        post_view_url = util.url_normalization(blog_post_url)
 
         # 리얼 블로그 주소를 셀레니움으로 파싱
-        driver.get(real_blog_post_url)
+        driver.get(post_view_url)
         
         # 게시물 번호 추출 후 본문 식별자 파악
-        log_no = naverblogcrawler.parse_log_no(real_blog_post_url)
+        blog_id, log_no = util.get_post_identifier_from_url(post_view_url)
         body_identifier = naverblogcrawler.parse_body_identifier(log_no).split('#')[1]
 
         # 본문 파싱
@@ -261,10 +255,10 @@ def get_multimedia(blog_post_url):
 
         # html에서 멀티미디어 객체 리스트 뽑아내기
         images, imos = parse_images(main_content)
-        videos = parse_videos(main_content)
+        videos = parse_videos(main_content)             # 느림
         hyperlinks = parse_hyperlink(main_content)
-        etcs = parse_etc(main_content)
-        texts = parse_text(main_content)
+        etcs = parse_etc(main_content)                  # 느림
+        texts = parse_text(main_content)                # 조금 느림
 
         print('parse done')
 
@@ -285,5 +279,4 @@ def get_multimedia(blog_post_url):
         return result_arr
 
     except Exception as e:
-        print('Multimedia parse failed : ')
-        print(e)
+        print('[SYSTEM][multimediacrawler] Multimedia parse failed\n', e)
