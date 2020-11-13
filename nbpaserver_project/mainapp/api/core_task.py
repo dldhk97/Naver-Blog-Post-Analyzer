@@ -158,7 +158,7 @@ def fetch_entire_info_from_urls(json_array):
             # 한 URL에 대해 모든 분석 혹은 로드를 마쳤음. 메모리 안에 해당 게시글의 모든 정보가 존재함.
             # 수집한 녀석들을 Json으로 바꾼다.
             # 클라이언트에게 줘야할 녀석들은, BlogInfo, Dictionary, AnalyzedInfo, MultimediaRatio임.
-            data = {}6
+            data = {}
             
             data['blog_info'] = serializers.serialize('json', [blog_info, ])
             data['analyzed_info'] = serializers.serialize('json', [analyzed_info, ])
