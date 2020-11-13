@@ -247,7 +247,7 @@ def get_multimedia(blog_post_url):
         blog_post_content = driver.find_element_by_id(body_identifier)
         main_content = parse_main_content(blog_post_content)
 
-        time.sleep(2)
+        time.sleep(1)
 
         # 본문 크기 구하기
         content_height = main_content.size['height']

@@ -8,8 +8,9 @@ from urllib.parse import urlparse, parse_qs
 # 'UTF-8'이 아닌, 'MS949'로 할 경우 엑셀에서 바로 열 수 있지만, 특정 문자(\u2027)가 포함된 경우 오류가 납니다.
 CSV_ENCODING_TYPE = 'utf-8'
 
-# URL 정규화(일반, 모바일 URL을 PostView URL로)
 def url_normalization(url):
+    'URL 정규화(일반, 모바일 URL을 PostView URL로)'
+    
     # 모바일 url 일반 url로 변경
     if 'm.blog.naver.com' in url:
         normalizated_url = url.replace('m.blog.naver.com', 'blog.naver.com')
@@ -40,7 +41,7 @@ def get_post_identifier_from_url(post_view_url):
         return blog_id, log_no
 
     except Exception as e:
-        print('[SYSTEM][crawler][util] Failed to get_blog_identifier_from_url\n', e)
+        print('[SYSTEM][crawler][util][get_post_identifier_from_url] Failed to get_blog_identifier_from_url\n', e)
         return None, None
 
 # 검색어, 결과 개수(옵션)를 주면 파싱해서 csv로 저장하는 메소드

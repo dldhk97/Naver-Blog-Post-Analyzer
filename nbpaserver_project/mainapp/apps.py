@@ -1,7 +1,7 @@
 import sys, os
 
 from django.apps import AppConfig
-from .api.model_task import load_module
+# from .api.model_task import load_module
 from .api.crawler import naverblogcrawler, multimediacrawler
 from .api import auth_task
 

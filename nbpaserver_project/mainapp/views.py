@@ -17,7 +17,7 @@ def get_analyzed_info(request):
 
         json_array = json.loads(request.body)
 
-        result = core_task.get_analyzed_info(json_array)
+        result = core_task.fetch_entire_info_from_urls(json_array)
 
         # send data to client 
         return JsonResponse(result, safe=False)

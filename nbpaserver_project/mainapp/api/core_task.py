@@ -1,17 +1,79 @@
-import os, sys
-import json
-
+import os, sys, json, time
+import concurrent.futures
 from django.db.models import Q
 from django.core import serializers
+
+from . import core_job
 from .. import models
 from .crawler.util import url_normalization, get_post_identifier_from_url
-from .crawler import naverblogcrawler, multimediacrawler
-from .analyzer.lorem_analyzer import get_distance, distance_describe
-from .analyzer.Keyword_Extractor import analyze_keywords
+from .crawler import naverblogcrawler
 from .util import model_converter
+from functools import partial
+
+def fetch_ratio_type(ratio_type_name):
+    ratio_type = models.RatioType.objects.filter(name=ratio_type_name)[0]
+    return ratio_type
+
+def fetch_dictionary_type(dictionary_type_name):
+    dictionray_type = models.DictionaryType.objects.filter(name=dictionary_type_name)[0]
+    return dictionray_type
+
+def fetch_dictionary(blog_info, dictionary_type_name):
+    '''
+    해당 블로그의 딕셔너리(django.model) list 반환
+    '''
+    dict_type = fetch_dictionary_type(dictionary_type_name)
+    dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type)
+
+    return list(dicts)
+
+def fetch_blog_info(target_url):
+    '''
+    DB에 BlogInfo가 있으면 반환, 없으면 크롤러로 파싱하여
+    DB에 BlogInfo를 저장하고 하이퍼링크, 태그를 Dictionary 테이블에 저장 후 반환
+    '''
+    blog_id, log_no = get_post_identifier_from_url(target_url)
+
+    # DB에서 동일한 게시글이 존재하는지 조회. blog_id, log_no가 파싱되면 그걸로 탐색, 없으면 url로 탐색
+    if blog_id and log_no:
+        bloginfo_arr = models.BlogInfo.objects.filter(blog_id=blog_id, log_no=log_no)
+    else:
+        bloginfo_arr = models.BlogInfo.objects.filter(url=target_url)
+
+    # DB에 블로그 정보가 없음
+    if len(bloginfo_arr) <= 0:
+        print('[SYSTEM][core_task] BlogInfo(' + target_url + ') does not exists in database!')
+
+        blog_post = naverblogcrawler.pasre_blog_post(target_url)
+        
+        blog_info, hyperlink_list, tag_list = model_converter.blog_post_to_django_model(blog_post)
+
+        # DB에 저장
+        blog_info.save()
+        print('[SYSTEM][core_task] BlogInfo(' + target_url + ') saved in database!')
+
+        for hyperlink in hyperlink_list:
+            hyperlink.save()
+        print('[SYSTEM][core_task] hyperlink_list(' + target_url + ') saved in database!')
+
+        for tag in tag_list:
+            tag.save()
+        print('[SYSTEM][core_task] tag_list(' + target_url + ') saved in database!')
+    else:
+        # DB에 BlogInfo가 존재하면 태그, 하이퍼링크, 키워드 가져옴
+        blog_info = bloginfo_arr[0]
+        tag_list = fetch_dictionary(blog_info, 'hashtag')
+        hyperlink_list = fetch_dictionary(blog_info, 'hyperlink')
+
+    return blog_info, tag_list, hyperlink_list
+
+
 
 # 분석, 키워드 추출 등 핵심 메소드
-def get_analyzed_info(json_array):
+def fetch_entire_info_from_urls(json_array):
+    '''
+    클라이언트에게 url 목록을 받으면 해당 게시글의 모든 정보(BlogInfo, AnalyzedInfo, tag, 를 반환함.
+    '''
     json_data_list = []
 
     header_data = {}
@@ -28,172 +90,91 @@ def get_analyzed_info(json_array):
             # 블로그 게시글이 아니면 패스
             if 'blog.naver.com' not in target_url:
                 continue
-                
-            # url에서 blog_id와 log_no 추출
+
             target_url = url_normalization(target_url)
-            blog_id, log_no = get_post_identifier_from_url(target_url)
             
-            # DB에서 동일한 게시글이 존재하는지 조회. blog_id, log_no가 파싱되면 그걸로 탐색, 없으면 url로 탐색
-            if blog_id and log_no:
-                bloginfo_arr = models.BlogInfo.objects.filter(blog_id=blog_id, log_no=log_no)
-            else:
-                bloginfo_arr = models.BlogInfo.objects.filter(url=target_url)
+            blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
 
-            # DB에 없는 신규 게시글이라면 파싱하여 DB에 저장.
-            # BlogInfo는 생성될 때 Dictionary들(태그, 하이퍼링크)가 함께 생성되므로, Dictioanry테이블에서도 로드/저장해야 함.
-            if len(bloginfo_arr) <= 0:
-                print('[SYSTEM][core_task] BlogInfo(' + blog_id +', ' + log_no + ') does not exists in database!')
-                blog_post = naverblogcrawler.pasre_blog_post(target_url)
-
-                # 크롤러의 blog_post 객체를 BlogInfo 객체와 2개의 dictionary 객체배열로 변환함.
-                blog_info, hyperlink_dicts, tag_dicts = model_converter.blog_post_to_model(blog_post)
-
-                # DB에 저장
-                blog_info.save()
-                print('[SYSTEM][core_task] BlogInfo(' + blog_id +', ' + log_no + ') saved in database!')
-
-                for hyperlink in hyperlink_dicts:
-                    hyperlink.save()
-                print('[SYSTEM][core_task] hyperlink_dicts(' + blog_id +', ' + log_no + ') saved in database!')
-
-                for tag in tag_dicts:
-                    tag.save()
-                print('[SYSTEM][core_task] tag_dicts(' + blog_id +', ' + log_no + ') saved in database!')
-            else:
-                # DB에 BlogInfo가 존재하면 태그, 하이퍼링크, 키워드 가져옴
-                blog_info = bloginfo_arr[0]
-                
-                dict_type_tag = models.DictionaryType.objects.filter(name='hashtag')[0]
-                tag_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_tag)
-
-                dict_type_hyperlink = models.DictionaryType.objects.filter(name='hyperlink')[0]
-                hyperlink_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_hyperlink)
+            if blog_info is None:
+                print('[SYSTEM][core_task][fetch_entire_info_from_urls] Failed to fetch blog_info!')
+                continue
             
             ###
             # 여기부턴 처리가 오래걸려서, 느리면 스레드 나누던지 해야할듯? 키워드 추출 알고리즘 & 로렘분석 & 멀티미디어 분석이 필요함.
             # 너무 코드가 길다. 함수로 나누자. 끔찍한 코드가 만들어지고 있음.
+            # 키워드추출, 로렘분석, 멀티미디어 비율 분석을 멀테프로세스로 처리
             ###
-
-            # 키워드가 DB에 존재하는지 체크함.
-            dict_type_keyword = models.DictionaryType.objects.filter(name='keyword')[0]
-            keyword_dicts = models.Dictionary.objects.filter(blog_info=blog_info, dictionary_type=dict_type_keyword)
-
-            # 키워드가 없으면 분석 시도
-            if len(keyword_dicts) <= 0:
-                keyword_dicts = []
-                print('[SYSTEM][core_task] keyword_dicts(' + blog_id +', ' + log_no + ') does not exists in database!')
-                keywords = analyze_keywords(blog_info.body, top_k=20)
-                for k in keywords:
-                    keyword = models.Dictionary()
-                    keyword.blog_info = blog_info
-                    keyword.dictionary_type = models.DictionaryType.objects.filter(name='keyword')[0]
-                    keyword.word = k[0]         # 단어/형태 모양으로 들어감
-                    keyword_dicts.append(keyword)
-
-                # 따로 for문 도는 이유는 키워드 목록이 만들어지는 도중에 터지면, 아예 DB에 저장하지 않게 하기 위함.
-                for k in keyword_dicts:
-                    k.save()
-
-                print('[SYSTEM][core_task] keyword_dicts(' + blog_id +', ' + log_no + ') saved in database!')
-
-            # DB에서 분석 정보가 있는지 검사한다.
-            analyzedinfo_arr = models.AnalyzedInfo.objects.filter(blog_info=blog_info)
             
-            # 분석 정보가 없으면 로렘, 태그유사성 분석한다.
-            if len(analyzedinfo_arr) <= 0:
-                print('[SYSTEM][core_task] AnalyzedInfo(' + blog_id +', ' + log_no + ') does not exists in database!')
+            start_time = time.time()
+
+            keyword_future = None
+            analyzed_info_future = None
+            multimedia_future = None
+
+            # 테이블 조회하고 정보가 없으면 작업 목록에 추가함.
+            keyword_list = fetch_dictionary(blog_info, 'keyword')
+            analyzedinfo_list = list(models.AnalyzedInfo.objects.filter(blog_info=blog_info))
+            multimedia_ratio_list = list(models.MultimediaRatio.objects.filter(blog_info=blog_info))
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                if len(keyword_list) <= 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+                    keyword_future = executor.submit(core_job.keyword_job, blog_info)
+                if len(analyzedinfo_list) <= 0:
+                    print('[SYSTEM][core_task] AnalyzedInfo(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+                    analyzed_info_future = executor.submit(core_job.analyze_job, blog_info)
+                else:
+                    analyzed_info = analyzedinfo_list[0]
+                if len(multimedia_ratio_list) <= 0:
+                    print('[SYSTEM][core_task] MultimediaInfo(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+                    multimedia_future = executor.submit(core_job.multimedia_job, blog_info)
+
+            # 멀티프로세싱이 끝나면, 각 정보들을 DB에 넣을 수 있게 모델 변환 후 저장
+            if keyword_future:
+                keyword_list = []
+                for word in keyword_future.result():
+                    dict_type = fetch_dictionary_type('keyword')
+                    converted_keyword = model_converter.dictionary_to_django_model(blog_info, word, dict_type)
+                    converted_keyword.save()
+                    keyword_list.append(converted_keyword)
+
+            if analyzed_info_future:
+                if analyzed_info_future.result() != {}:
+                    analyzed_info = analyzed_info_future.result()
+                    converted_analyzed_info = model_converter.analyzed_info_to_django_model(blog_info, analyzed_info['lorem_percentage'], analyzed_info['tag_similarity'])
+                    converted_analyzed_info.save()
+                    analyzed_info = converted_analyzed_info
+
+            if multimedia_future:
+                multimedia_ratio_list = []
+                for ratio in multimedia_future.result():
+                    ratio_type = fetch_ratio_type(ratio['ratio_type'])
+                    converted_ratio = model_converter.multimedia_ratio_to_django_model(blog_info, ratio['ratio'], ratio_type)
+                    converted_ratio.save()
+                    multimedia_ratio_list.append(converted_ratio)
                 
-                # 본문은 여러줄이지만, 일단 돌아갈 수 있게 첫줄만 분석. 여러줄 분석이 미구현이므로.
-                first_line = str(blog_info.body).split('\n')[0]
-                try:
-                    result_tok_list, result_prob_list = get_distance(first_line)
-                except Exception as e:
-                    print('[SYSTEM][core_task] AnalyzedInfo(' + blog_id +', ' + log_no + ') failed to analysis!')
-                    json_data_list[0]['message'] = '분석 도중 오류가 발생했습니다!'
-                    return json_data_list
-                
-                # 현재 정확한 확률을 못구하니까, 그냥 대충 확률 배열이 평균을 확률이라 한다.
-                mean, variance, standard_deviation = distance_describe(result_prob_list)
-                lorem_percentage = mean
-
-                # 태그유사성은 미구현이므로 패스... 구현이 된다면 코드를 바꾸면 됨.
-                tag_similarity = 0;
-
-                # AnalyzedInfo 객체 생성하여 DB에 저장
-                analyzed_info = models.AnalyzedInfo()
-                analyzed_info.blog_info = blog_info
-                analyzed_info.lorem_percentage = lorem_percentage
-                analyzed_info.tag_similarity = tag_similarity
-                    
-                # DB에 저장!
-                analyzed_info.save()
-                print('[SYSTEM][core_task] AnalyzedInfo(' + blog_id +', ' + log_no + ') saved in database!')
-            else:
-                # DB에 분석 정보가 존재한다면 가져옴
-                analyzed_info = analyzedinfo_arr[0]
-                
-            # DB에서 멀티미디어 정보가 있는지 검사한다.
-            multimedia_ratios = models.MultimediaRatio.objects.filter(blog_info=blog_info)
-
-            # 멀티미디어 정보가 없으면 멀티미디어 정보 분석한다.
-            if len(multimedia_ratios) <= 0:
-                print('[SYSTEM][core_task] MultimediaInfo(' + blog_id +', ' + log_no + ') does not exists in database!')
-                
-                # 셀레니움 크롤링 후 멀티미디어 비율을 저장한다.
-                crawled_multimedia_ratios = multimediacrawler.get_multimedia(target_url)
-                ratio_type_name_arr = ['image', 'imoticon', 'video', 'hyperlink', 'text', 'blank', 'etc', 'unknown']
-
-                # float 값만 있는 ratios 배열을 모델 배열로 바꾸면서, DB에는 저장한다.
-                multimedia_ratios = []
-                for i in range(len(crawled_multimedia_ratios)):
-                    if crawled_multimedia_ratios[i]:
-                        multimedia_ratio = models.MultimediaRatio()
-                        multimedia_ratio.blog_info = blog_info
-                        multimedia_ratio.ratio = crawled_multimedia_ratios[i]
-                        
-                        ratio_type = models.RatioType.objects.filter(name=ratio_type_name_arr[i])[0]
-                        multimedia_ratio.ratio_type = ratio_type
-                        multimedia_ratio.save()
-                        multimedia_ratios.append(multimedia_ratio)
-
-                print('[SYSTEM][core_task] MultimediaInfo(' + blog_id +', ' + log_no + ') saved in database!')
+            print("%s"%(time.time()-start_time))
 
             # 한 URL에 대해 모든 분석 혹은 로드를 마쳤음. 메모리 안에 해당 게시글의 모든 정보가 존재함.
             # 수집한 녀석들을 Json으로 바꾼다.
             # 클라이언트에게 줘야할 녀석들은, BlogInfo, Dictionary, AnalyzedInfo, MultimediaRatio임.
-            data = {}
+            data = {}6
+            
             data['blog_info'] = serializers.serialize('json', [blog_info, ])
             data['analyzed_info'] = serializers.serialize('json', [analyzed_info, ])
 
-            data['tags'] = serializers.serialize('json', tag_dicts)
-            data['hyperlinks'] = serializers.serialize('json', hyperlink_dicts)
-            data['keywords'] = serializers.serialize('json', keyword_dicts)
-            data['multimedia_ratios'] = serializers.serialize('json', multimedia_ratios)
+            data['tags'] = serializers.serialize('json', tag_list)
+            data['hyperlinks'] = serializers.serialize('json', hyperlink_list)
+            data['keywords'] = serializers.serialize('json', keyword_list)
+            data['multimedia_ratios'] = serializers.serialize('json', multimedia_ratio_list)
 
             json_data_list.append(data)
         except Exception as e:
-            print('[SYSTEM][core_task] AnalyzedInfo(' + target_url + ') failed to get_analyzed_info\n', e)
+            print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+            pass
 
     if len(json_data_list) > 1:
         json_data_list[0]['success'] = 'True'
         json_data_list[0]['message'] = '게시물 분석 정보 로드하였음.'
 
     return json_data_list
-
-def json_to_bloginfo(json_array):
-    
-    # JSON 배열을 BlogInfo 배열로 바꾸기
-    bloginfo_arr = []
-    for json_obj in json_array:
-        info = models.BlogInfo()
-        info.blog_id = json_obj['blog_id']
-        info.log_no = json_obj['log_no']
-        info.url = json_obj['url']
-        info.title = json_obj['title']
-        info.body = json_obj['body']
-
-        print(str(info))
-    
-        bloginfo_arr.append(info)
-
-    pass
