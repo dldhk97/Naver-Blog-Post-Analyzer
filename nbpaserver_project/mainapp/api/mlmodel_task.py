@@ -1,6 +1,6 @@
 from .analyzer.lorem_analyzer import load_module as analyzer_load_module
 
-def load_module():
+def mlload_module():
     print('[SYSTEM][model_task] Start loading module.')
 
     response = {}

@@ -58,21 +58,3 @@ def multimedia_ratio_to_django_model(blog_info, ratio, ratio_type):
     multimedia_ratio.ratio_type = ratio_type
     
     return multimedia_ratio
-
-# def json_to_bloginfo(json_array):
-    
-#     # JSON 배열을 BlogInfo 배열로 바꾸기
-#     bloginfo_arr = []
-#     for json_obj in json_array:
-#         info = models.BlogInfo()
-#         info.blog_id = json_obj['blog_id']
-#         info.log_no = json_obj['log_no']
-#         info.url = json_obj['url']
-#         info.title = json_obj['title']
-#         info.body = json_obj['body']
-
-#         print(str(info))
-    
-#         bloginfo_arr.append(info)
-
-#     pass

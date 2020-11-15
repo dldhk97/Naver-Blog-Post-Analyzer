@@ -137,6 +137,8 @@ def fetch_entire_info_from_urls(json_array):
                     converted_keyword = model_converter.dictionary_to_django_model(blog_info, word, dict_type)
                     converted_keyword.save()
                     keyword_list.append(converted_keyword)
+                if len(keyword_list) > 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
 
             if analyzed_info_future:
                 if analyzed_info_future.result() != {}:
@@ -144,6 +146,7 @@ def fetch_entire_info_from_urls(json_array):
                     converted_analyzed_info = model_converter.analyzed_info_to_django_model(blog_info, analyzed_info['lorem_percentage'], analyzed_info['tag_similarity'])
                     converted_analyzed_info.save()
                     analyzed_info = converted_analyzed_info
+                    print('[SYSTEM][core_task] AnalyzedInfo(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
 
             if multimedia_future:
                 multimedia_ratio_list = []
@@ -152,6 +155,8 @@ def fetch_entire_info_from_urls(json_array):
                     converted_ratio = model_converter.multimedia_ratio_to_django_model(blog_info, ratio['ratio'], ratio_type)
                     converted_ratio.save()
                     multimedia_ratio_list.append(converted_ratio)
+                if len(multimedia_ratio_list) > 0:
+                    print('[SYSTEM][core_task] MultimediaInfo(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
                 
             print("%s"%(time.time()-start_time))
 
