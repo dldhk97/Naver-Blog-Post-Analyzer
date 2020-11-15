@@ -44,7 +44,7 @@ def fetch_blog_info(target_url):
     if len(bloginfo_arr) <= 0:
         print('[SYSTEM][core_task] BlogInfo(' + target_url + ') does not exists in database!')
 
-        blog_post = naverblogcrawler.pasre_blog_post(target_url)
+        blog_post = core_job.bloginfo_job(target_url)
         
         blog_info, hyperlink_list, tag_list = model_converter.blog_post_to_django_model(blog_post)
 

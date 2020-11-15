@@ -2,7 +2,7 @@
 # 관리자용 메소드를 사용할 수도 있고, 확장프로그램이 만들어지지 않았기에 디버깅용으로 사용.
 # AJAX Request를 통해 서버와 통신함.
 
-import simple_cli
+import simple_cli, cli_task
 
 if __name__ == '__main__':
     print('Naver Blog Post Analyzer : Admin Client')
@@ -10,8 +10,7 @@ if __name__ == '__main__':
     exit_code = -1
     
     # 관리자 인증
-    if simple_cli.admin_authorization():
-    
+    if cli_task.admin_authorization():
         exit_code = simple_cli.main_loop(simple_cli.MENU_DICTS)
     else:
         print('관리자 인증에 실패하였습니다.')

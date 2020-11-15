@@ -1,4 +1,3 @@
-import core_task
 import cli_task
 
 CLIENT_FUNCS = [
@@ -19,12 +18,8 @@ ADMIN_FUNCS = [
     [None, '모델 저장하기'],
 ]
 TEST_FUNCS = [
-    [core_task.load_module, '모듈 로드'],
-    [core_task.lorem_analyze, '로렘 분석'],
-    [core_task.crawl_by_search_word, '검색어로 크롤링하기'],
-    [core_task.crawl_single_post, 'URL로 한 게시글 크롤링하기'],
-    [core_task.crawl_multimedia, 'URL로 한 게시글 멀티미디어 크롤링하기'],
-    [core_task.get_analyzed_info, 'URL 목록 전송하여 분석결과 반환'],
+    [cli_task.load_module, '모듈 로드'],
+    [cli_task.lorem_analyze, '로렘 분석'],
 ]
 
 MENU_DICTS = [
@@ -60,19 +55,3 @@ def main_loop(funcs):
             print('[SYSTEM][main_loop]', e)
             # return -1
         
-def admin_authorization():
-    print('관리자용 클라이언트 사용을 위해 로그인이 필요합니다.')
-    try:
-        while(True):
-            admin_id = input('ID:')
-            admin_pw = input('PW:')
-            
-            if core_task.authorization(admin_id, admin_pw):
-                print('로그인 성공!')
-                return True
-            else:
-                print('로그인에 실패하였습니다. 다시 시도해주세요.')
-
-    except Exception as e:
-        print('[CLEINT][simple_cli] Authorization exception occured', e)
-        return False

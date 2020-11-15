@@ -22,7 +22,4 @@ urlpatterns = [
     url('admin/test/authorization', views.authorization, name='admin/test/authorization'),
     url('admin/test/lorem_analyze', views.lorem_analyze, name='admin/test/lorem_analyze'),
     url('admin/test/getanalyzedinfo', views.get_analyzed_info, name='admin/test/getanalyzedinfo'),
-    url('admin/test/crawlbysearchword', views.crawl_by_search_word, name='admin/test/crawlbysearchword'),
-    url('admin/test/crawlsingleblog', views.crawl_single_blog, name='admin/test/crawlsingleblog'),
-    url('admin/test/crawlsingleblogmedia', views.crawl_single_blog_multimedia, name='admin/test/crawlsingleblogmedia'),
 ]

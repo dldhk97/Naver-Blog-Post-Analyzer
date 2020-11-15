@@ -5,10 +5,12 @@ from .crawler import blogpost
 
 MULTIMEDIA_RATIO_TYPES = ['image', 'imoticon', 'video', 'hyperlink', 'text', 'blank', 'etc']
 
-def job_func(job, blog_info):
-    print(type(job))
-    print(type(blog_info))
-    return job(blog_info)
+def bloginfo_job(target_url):
+    '''
+    URL을 받으면 크롤링하여 BlogPost 객체로 반환
+    '''
+    blog_post = naverblogcrawler.pasre_blog_post(target_url)
+    return blog_post
 
 def keyword_job(blog_info):
     '''

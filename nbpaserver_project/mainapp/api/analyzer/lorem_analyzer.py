@@ -8,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 MAX_WORD_LEN = 100	# 2번, 문장 생성 기능시 무한루프 방지용 최대단어개수
+VOCAB_SIZE = 50000
 
 model = None
 vocab = None
@@ -67,7 +68,7 @@ def get_distance(sentence):
         pred = model(input_ids)[0]
         
         probs = torch.nn.functional.softmax(pred, dim=-1)
-        k = 50000
+        k = VOCAB_SIZE
         top_k = torch.topk(probs, k=k)
 
         # print(top_k)
@@ -93,23 +94,6 @@ def get_distance(sentence):
 
         if not did_you_find:
             print('I cant find. ' + word)
-
-
-        # # 연관성이 높은 순으로 vocab을 뒤지는데, 다음 녀석이 존재하는지 찾는다.
-        # distance = 0
-        # ye1 = vocab.idx_to_token[3918]
-        # yey = vocab.idx_to_token[104]
-        # # print(torch.argsort(pred, axis=-1, descending=True)[0])
-        
-        # for vocab_idx in torch.argsort(pred, axis=-1, descending=True)[0][cnt]:
-        #     # 연관성 순 인덱스와, 다음 단어의 인덱스가 같다면, 거리(1위로 부터의 거리)를 구하고 반복 종료
-        #     print(vocab_idx)
-        #     if vocab_idx == vocab[word]:
-        #         # print(word + ' of distance : ' + str(distance))
-                
-        #         distance_list.append(distance)
-        #         break
-        #     distance += 1   # 두 인덱스가 다르면 거리 +1
         
         cnt += 1          # 다음 단어를 분석하기위해 cnt +1
 

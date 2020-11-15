@@ -44,17 +44,10 @@ def load_module():
     except Exception as e:
         print('[CLEINT][core_task] Failed to load_module.\n', e)
 
-def lorem_analyze():
+def lorem_analyze(sents):
     request_url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
     
     try:
-        # 현재 한 줄만 분석이 가능하므로, 여러 문장을 전송해도 한 문장만 분석합니다.
-        line_cnt = input('몇줄짜리 글입니까? : ')
-        print('글을 입력하세요 : ')
-        sents = ""
-        for s in range(int(line_cnt)):
-            sents += input() + '\n'
-
         data = {}
         data['sents'] = sents
         
@@ -66,14 +59,16 @@ def lorem_analyze():
             json_data = json.loads(response.text)
             if json_data['success'] == 'True':
                 print('')
-                print('토큰 : ')
+                print('확률 : ')
                 print(json_data['distances'])
+                print('토큰 : ')
                 print(json_data['tokens'])
                 print('평균값 : ' + json_data['mean'])
                 # 분산 내보기
                 print('분산 : ' + json_data['variance'])
                 # 표준편차 구하기
                 print('표준편차 : ' + json_data['standard_deviation'])
+                print('로렘 확률 : ' + json_data['lorem_percentage'])
                 print('')
 
                 return True
@@ -85,23 +80,13 @@ def lorem_analyze():
     except Exception as e:
         print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
-def crawl_by_search_word():
+def crawl_by_search_word(word, post_count):
     request_url = HOST_URL_HEAD + 'admin/test/crawlbysearchword'
 
     try:
-        search_word = input('검색어 : ')
-        if search_word is None:
-            print('검색어가 올바르지 않습니다.')
-            return
-
-        blog_post_count = input('크롤링할 포스트의 개수 : ')
-        if not blog_post_count.isdigit:
-            print('크롤링할 포스트의 개수가 올바르지 않습니다.')
-            return
-
         data = {}
-        data['search_word'] = search_word
-        data['blog_post_count'] = blog_post_count
+        data['search_word'] = word
+        data['blog_post_count'] = post_count
         
         json_data = json.dumps(data)
         
@@ -119,30 +104,26 @@ def crawl_by_search_word():
         print('[CLEINT][core_task] Crawl_by_search_word exception occured.\n', e)
         
 
-def crawl_single_post():
-    url = input('URL : ')
+def crawl_single_post(url):
     if url is not None:
         # naver_blog_post_crawler.crawl_single_post(url)
-        pass 
+        print('Deprecated method.')
     else:
         print('URL이 올바르지 않습니다.')
 
-def crawl_multimedia():
-    url = input('URL : ')
-    if url is not None:
-        # images_ratio, imos_ratio, videos_ratio, hyperlinks_ratio, etcs_ratio, texts_ratio, blanks_ratio = multimediacrawler.get_multimedia(url)
-        
-        # 멀티미디어 종류별 비율 표시
-        # print('이미지의 비율 : ', str(round(images_ratio, 3) * 100), '%')
-        # print('이모티콘의 비율 : ', str(round(imos_ratio, 3) * 100), '%')
-        # print('비디오의 비율 : ', str(round(videos_ratio, 3) * 100), '%')
-        # print('하이퍼링크 비율 : ', str(round(hyperlinks_ratio, 3) * 100), '%')
-        # print('기타(iframe) 비율 : ', str(round(etcs_ratio, 3) * 100), '%')
-        # print('텍스트 비율 : ', str(round(texts_ratio, 3) * 100), '%')
-        # print('공백 비율 : ', str(round(blanks_ratio, 3) * 100), '%')
-        pass
-    else:
-        print('URL이 올바르지 않습니다.')
+def crawl_multimedia(url):
+    print('Deprecated method.')
+    # images_ratio, imos_ratio, videos_ratio, hyperlinks_ratio, etcs_ratio, texts_ratio, blanks_ratio = multimediacrawler.get_multimedia(url)
+    
+    # 멀티미디어 종류별 비율 표시
+    # print('이미지의 비율 : ', str(round(images_ratio, 3) * 100), '%')
+    # print('이모티콘의 비율 : ', str(round(imos_ratio, 3) * 100), '%')
+    # print('비디오의 비율 : ', str(round(videos_ratio, 3) * 100), '%')
+    # print('하이퍼링크 비율 : ', str(round(hyperlinks_ratio, 3) * 100), '%')
+    # print('기타(iframe) 비율 : ', str(round(etcs_ratio, 3) * 100), '%')
+    # print('텍스트 비율 : ', str(round(texts_ratio, 3) * 100), '%')
+    # print('공백 비율 : ', str(round(blanks_ratio, 3) * 100), '%')
+    pass
 
 def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords):
     blog_info = blog_info['fields']
