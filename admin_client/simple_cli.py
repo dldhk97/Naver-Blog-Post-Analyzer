@@ -1,10 +1,11 @@
 import core_task
+import cli_task
 
 CLIENT_FUNCS = [
-    [core_task.get_analyzed_info, '게시글 분석 정보 보기'],
-    [core_task.get_keywords, '게시글 키워드 미리보기'],
-    [core_task.get_bloginfo, '게시글 미리보기'],
-    [None, '피드백 남기기'],
+    [cli_task.get_analyzed_info, '게시글 분석 정보 보기'],
+    [cli_task.get_keyword, '게시글 키워드 미리보기'],
+    [cli_task.get_bloginfo, '게시글 미리보기'],
+    [cli_task.send_feedback, '피드백 남기기'],
 ]
 ADMIN_FUNCS = [
     [None, '피드백 조회'],

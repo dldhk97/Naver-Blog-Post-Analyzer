@@ -6,7 +6,7 @@ HOST_PORT = constants.ServerInfo.CONNECTION_INFO['default']['PORT']
 HOST_URL_HEAD = 'http://' + HOST_IP + ':' + HOST_PORT + '/request/'
 
 def authorization(admin_id, admin_pw):
-    url = HOST_URL_HEAD + 'admin/test/authorization'
+    request_url = HOST_URL_HEAD + 'admin/test/authorization'
 
     try:
         data = {}
@@ -15,7 +15,7 @@ def authorization(admin_id, admin_pw):
         
         json_data = json.dumps(data)
         
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 201:
             json_data = json.loads(response.text)
@@ -30,10 +30,10 @@ def authorization(admin_id, admin_pw):
         print('[CLEINT][core_task] Exception occured at authorization\n', e)
 
 def load_module():
-    url = HOST_URL_HEAD + 'admin/model/load'
+    request_url = HOST_URL_HEAD + 'admin/model/load'
 
     try:        
-        response = requests.get(url)
+        response = requests.get(request_url)
 
         if response.status_code == 200 or response.status_code == 201:
             json_data = json.loads(response.text)
@@ -45,7 +45,7 @@ def load_module():
         print('[CLEINT][core_task] Failed to load_module.\n', e)
 
 def lorem_analyze():
-    url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
+    request_url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
     
     try:
         # 현재 한 줄만 분석이 가능하므로, 여러 문장을 전송해도 한 문장만 분석합니다.
@@ -60,7 +60,7 @@ def lorem_analyze():
         
         json_data = json.dumps(data)
         
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
             json_data = json.loads(response.text)
@@ -86,7 +86,7 @@ def lorem_analyze():
         print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
 def crawl_by_search_word():
-    url = HOST_URL_HEAD + 'admin/test/crawlbysearchword'
+    request_url = HOST_URL_HEAD + 'admin/test/crawlbysearchword'
 
     try:
         search_word = input('검색어 : ')
@@ -105,7 +105,7 @@ def crawl_by_search_word():
         
         json_data = json.dumps(data)
         
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
         
         if response.status_code == 200 or response.status_code == 200:
             json_data = json.loads(response.text)
@@ -169,24 +169,16 @@ def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hy
 
     pass
 
-def get_analyzed_info():
-    url = HOST_URL_HEAD + 'admin/test/getanalyzedinfo'
+def get_analyzed_info(data_list):
+    '''
+    URL 목록 딕셔너리를 입력받으면 서버로 보내고 결과 출력
+    '''
+    request_url = HOST_URL_HEAD + 'admin/test/getanalyzedinfo'
     
     try:
-        # url 목록 전송
-        line_cnt = input('url의 개수는? : ')
-
-        print('url : ')
-        data_list = []
-
-        for _ in range(int(line_cnt)):
-            data = {}
-            data['url'] = input()
-            data_list.append(data)
-        
         json_data = json.dumps(data_list)
         
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
             blog_entire_info_arr = json.loads(response.text)
@@ -206,7 +198,6 @@ def get_analyzed_info():
                     
                     print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords)
                     
-
                 return True
             else:    
                 print('[SERVER]', header_data['message'])
@@ -216,85 +207,96 @@ def get_analyzed_info():
     except Exception as e:
         print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
 
-def get_keywords():
-    url = HOST_URL_HEAD + 'user/keyword/get'
+def get_keyword(url):
+    '''
+    URL 하나만 서버로 보내서, 해당 게시글의 키워드목록 가져옴
+    '''
+    request_url = HOST_URL_HEAD + 'user/keyword/get'
     
     try:
-        # url 목록 전송
-        line_cnt = input('url의 개수는? : ')
-
-        print('url : ')
-        data_list = []
-
-        for _ in range(int(line_cnt)):
-            data = {}
-            data['url'] = input()
-            data_list.append(data)
+        data = {}
+        data['url'] = url
+        json_data = json.dumps(data)
         
-        json_data = json.dumps(data_list)
-        
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            blog_entire_info_arr = json.loads(response.text)
-
-            header_data = blog_entire_info_arr[0]
+            response_data = json.loads(response.text)
                 
-            if header_data['success'] == 'True':
+            if response_data['success'] == 'True':
+                keywords = json.loads(response_data['keywords'])
                 
-                for info in blog_entire_info_arr[1:]:
-                    keywords = json.loads(info['keywords'])
-                    
-                    for keyword in keywords:
-                        k = keyword['fields']
-                        print(k)
+                for keyword in keywords:
+                    k = keyword['fields']
+                    print(k)
 
                 return True
             else:    
-                print('[SERVER]', header_data['message'])
+                print('[SERVER]', response_data['message'])
                 return False
 
-        print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
+        print('[CLEINT][core_task] get_keywords error occured! Status_code is not 200 or 201!')
     except Exception as e:
-        print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
+        print('[CLEINT][core_task] get_keywords exception occured.\n', e)
 
-def get_bloginfo():
-    url = HOST_URL_HEAD + 'user/bloginfo/get'
+def get_bloginfo(url):
+    '''
+    URL 하나만 서버로 보내서, 해당 게시글의 BlogInfo 가져옴
+    '''
+    request_url = HOST_URL_HEAD + 'user/bloginfo/get'
     
     try:
-        # url 목록 전송
-        line_cnt = input('url의 개수는? : ')
-
-        print('url : ')
-        data_list = []
-
-        for _ in range(int(line_cnt)):
-            data = {}
-            data['url'] = input()
-            data_list.append(data)
+        data = {}
+        data['url'] = url
+        json_data = json.dumps(data)
         
-        json_data = json.dumps(data_list)
-        
-        response = requests.post(url, data=json_data)
+        response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            blog_entire_info_arr = json.loads(response.text)
-
-            header_data = blog_entire_info_arr[0]
+            response_data = json.loads(response.text)
                 
-            if header_data['success'] == 'True':
-                
-                for info in blog_entire_info_arr[1:]:
-                    blog_info = json.loads(info['blog_info'])[0]
-                    blog_info = blog_info['fields']
-                    print(blog_info)
-
+            if response_data['success'] == 'True':
+                blog_info = json.loads(response_data['blog_info'])
+                blog_info = blog_info[0]['fields']
+                print(blog_info)
                 return True
             else:    
-                print('[SERVER]', header_data['message'])
+                print('[SERVER]', response_data['message'])
                 return False
 
-        print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
+        print('[CLEINT][core_task] get_bloginfo error occured! Status_code is not 200 or 201!')
     except Exception as e:
-        print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
+        print('[CLEINT][core_task] get_bloginfo exception occured.\n', e)
+
+def send_feedback(url, ip, feedback_type, message):
+    '''
+    url, ip, 피드백 타입, 메시지 등을 서버로 보내 피드백테이블에 저장하게 함.
+    '''
+    request_url = HOST_URL_HEAD + 'user/feedback/send'
+    
+    try:
+        data = {}
+        data['url'] = url
+        data['ip'] = ip
+        data['feedback_type'] = feedback_type
+        data['message'] = message
+        
+        json_data = json.dumps(data)
+        
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            response_data = json.loads(response.text)
+                
+            if response_data['success'] == 'True':
+                msg = response_data['message']
+                print('[SERVER', msg)
+                return True
+            else:    
+                print('[SERVER]', response_data['message'])
+                return False
+
+        print('[CLEINT][core_task] send_feedback error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] send_feedback exception occured.\n', e)
 

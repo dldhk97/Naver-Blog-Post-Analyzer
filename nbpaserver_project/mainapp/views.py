@@ -17,7 +17,7 @@ def get_analyzed_info(request):
 
         json_array = json.loads(request.body)
 
-        result = core_task.fetch_entire_info_from_urls(json_array)
+        result = core_task.get_entire_info_from_urls(json_array)
 
         # send data to client 
         return JsonResponse(result, safe=False)
@@ -27,12 +27,12 @@ def get_analyzed_info(request):
 
 # 키워드 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
-def get_keywords(request):
+def get_keyword(request):
     if request.method == 'POST':
     
         json_array = json.loads(request.body)
 
-        result = core_task.get_keywords(json_array)
+        result = core_task.get_keyword(json_array)
 
         # send data to client 
         return JsonResponse(result, safe=False)
@@ -42,7 +42,7 @@ def get_keywords(request):
 
 # 블로그 정보(미리보기) 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
-def get_keywords(request):
+def get_bloginfo(request):
     if request.method == 'POST':
     
         json_array = json.loads(request.body)
@@ -55,8 +55,19 @@ def get_keywords(request):
     print('[SYSTEM]Do not handle get request.')
     pass
 
+# 피드백 생성시
 @method_decorator(csrf_exempt, name='dispatch')
-def create_feedback(request):
+def send_feedback(request):
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.send_feedback(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
     pass
 
 ################################

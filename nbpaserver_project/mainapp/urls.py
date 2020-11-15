@@ -4,10 +4,10 @@ from . import views
 
 urlpatterns = [
     url('user/analyzedinfo/get', views.get_analyzed_info, name='user/analyzedinfo/get'),
-    url('user/keyword/get', views.get_keywords, name='user/keyword/get'),
-    url('user/bloginfo/get', views.get_keywords, name='user/bloginfo/get'),
+    url('user/keyword/get', views.get_keyword, name='user/keyword/get'),
+    url('user/bloginfo/get', views.get_bloginfo, name='user/bloginfo/get'),
     
-    url('user/feedback/create', views.create_feedback, name='user/feedback/create'),
+    url('user/feedback/send', views.send_feedback, name='user/feedback/send'),
     url('admin/feedback/get', views.get_feedbacks, name='admin/feedback/get'),
     url('admin/feedback/delete', views.delete_feedback, name='admin/feedback/delete'),
 
