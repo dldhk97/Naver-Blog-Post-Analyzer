@@ -183,3 +183,171 @@ def fetch_entire_info_from_urls(json_array):
         json_data_list[0]['message'] = '게시물 분석 정보 로드하였음.'
 
     return json_data_list
+    
+def lookup_keywords(json_array):
+    json_data_list = []
+
+    header_data = {}
+    header_data['success'] = 'False'
+    header_data['message'] = '키워드 정보를 불러오는 중 오류 발생!'
+
+    json_data_list.append(header_data)
+
+    # 받아온 url 목록을 순차 탐색
+    for json_obj in json_array:
+        try:
+            target_url = json_obj['url']
+
+            # 블로그 게시글이 아니면 패스
+            if 'blog.naver.com' not in target_url:
+                continue
+
+            target_url = url_normalization(target_url)
+            
+            blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
+
+            if blog_info is None:
+                print('[SYSTEM][core_task][fetch_entire_info_from_urls] Failed to fetch blog_info!')
+                continue
+        
+            keyword_future = None
+
+            # 테이블 조회하고 정보가 없으면 작업 목록에 추가함.
+            keyword_list = fetch_dictionary(blog_info, 'keyword')
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                if len(keyword_list) <= 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+                    keyword_future = executor.submit(core_job.keyword_job, blog_info)
+
+            # 멀티프로세싱이 끝나면, 각 정보들을 DB에 넣을 수 있게 모델 변환 후 저장
+            if keyword_future:
+                keyword_list = []
+                for word in keyword_future.result():
+                    dict_type = fetch_dictionary_type('keyword')
+                    converted_keyword = model_converter.dictionary_to_django_model(blog_info, word, dict_type)
+                    converted_keyword.save()
+                    keyword_list.append(converted_keyword)
+                if len(keyword_list) > 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
+
+            data = {}
+            
+            data['keywords'] = serializers.serialize('json', keyword_list)
+
+            json_data_list.append(data)
+        except Exception as e:
+            print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+            pass
+
+    if len(json_data_list) > 1:
+        json_data_list[0]['success'] = 'True'
+        json_data_list[0]['message'] = '키워드 정보 로드하였음.'
+
+    return json_data_list
+
+def get_keywords(json_array):
+    json_data_list = []
+
+    header_data = {}
+    header_data['success'] = 'False'
+    header_data['message'] = '키워드 정보를 불러오는 중 오류 발생!'
+
+    json_data_list.append(header_data)
+
+    # 받아온 url 목록을 순차 탐색
+    for json_obj in json_array:
+        try:
+            target_url = json_obj['url']
+
+            # 블로그 게시글이 아니면 패스
+            if 'blog.naver.com' not in target_url:
+                continue
+
+            target_url = url_normalization(target_url)
+            
+            blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
+
+            if blog_info is None:
+                print('[SYSTEM][core_task][fetch_entire_info_from_urls] Failed to fetch blog_info!')
+                continue
+        
+            keyword_future = None
+
+            # 테이블 조회하고 정보가 없으면 작업 목록에 추가함.
+            keyword_list = fetch_dictionary(blog_info, 'keyword')
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                if len(keyword_list) <= 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+                    keyword_future = executor.submit(core_job.keyword_job, blog_info)
+
+            # 멀티프로세싱이 끝나면, 각 정보들을 DB에 넣을 수 있게 모델 변환 후 저장
+            if keyword_future:
+                keyword_list = []
+                for word in keyword_future.result():
+                    dict_type = fetch_dictionary_type('keyword')
+                    converted_keyword = model_converter.dictionary_to_django_model(blog_info, word, dict_type)
+                    converted_keyword.save()
+                    keyword_list.append(converted_keyword)
+                if len(keyword_list) > 0:
+                    print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
+
+            data = {}
+            
+            data['keywords'] = serializers.serialize('json', keyword_list)
+
+            json_data_list.append(data)
+        except Exception as e:
+            print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+            pass
+
+    if len(json_data_list) > 1:
+        json_data_list[0]['success'] = 'True'
+        json_data_list[0]['message'] = '키워드 정보 로드하였음.'
+
+    return json_data_list
+
+    
+def get_bloginfo(json_array):
+    json_data_list = []
+
+    header_data = {}
+    header_data['success'] = 'False'
+    header_data['message'] = '블로그 정보를 불러오는 중 오류 발생!'
+
+    json_data_list.append(header_data)
+
+    # 받아온 url 목록을 순차 탐색
+    for json_obj in json_array:
+        try:
+            target_url = json_obj['url']
+
+            # 블로그 게시글이 아니면 패스
+            if 'blog.naver.com' not in target_url:
+                continue
+
+            target_url = url_normalization(target_url)
+            
+            blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
+
+            if blog_info is None:
+                print('[SYSTEM][core_task][fetch_entire_info_from_urls] Failed to fetch blog_info!')
+                continue
+
+            data = {}
+            
+            data['blog_info'] = serializers.serialize('json', [blog_info, ])
+
+            json_data_list.append(data)
+        except Exception as e:
+            print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+            pass
+
+    if len(json_data_list) > 1:
+        json_data_list[0]['success'] = 'True'
+        json_data_list[0]['message'] = '블로그 정보 로드하였음.'
+
+    return json_data_list
+
+    

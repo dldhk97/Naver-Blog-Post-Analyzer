@@ -215,3 +215,86 @@ def get_analyzed_info():
         print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
     except Exception as e:
         print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
+
+def get_keywords():
+    url = HOST_URL_HEAD + 'user/keyword/get'
+    
+    try:
+        # url 목록 전송
+        line_cnt = input('url의 개수는? : ')
+
+        print('url : ')
+        data_list = []
+
+        for _ in range(int(line_cnt)):
+            data = {}
+            data['url'] = input()
+            data_list.append(data)
+        
+        json_data = json.dumps(data_list)
+        
+        response = requests.post(url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            blog_entire_info_arr = json.loads(response.text)
+
+            header_data = blog_entire_info_arr[0]
+                
+            if header_data['success'] == 'True':
+                
+                for info in blog_entire_info_arr[1:]:
+                    keywords = json.loads(info['keywords'])
+                    
+                    for keyword in keywords:
+                        k = keyword['fields']
+                        print(k)
+
+                return True
+            else:    
+                print('[SERVER]', header_data['message'])
+                return False
+
+        print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
+
+def get_bloginfo():
+    url = HOST_URL_HEAD + 'user/bloginfo/get'
+    
+    try:
+        # url 목록 전송
+        line_cnt = input('url의 개수는? : ')
+
+        print('url : ')
+        data_list = []
+
+        for _ in range(int(line_cnt)):
+            data = {}
+            data['url'] = input()
+            data_list.append(data)
+        
+        json_data = json.dumps(data_list)
+        
+        response = requests.post(url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            blog_entire_info_arr = json.loads(response.text)
+
+            header_data = blog_entire_info_arr[0]
+                
+            if header_data['success'] == 'True':
+                
+                for info in blog_entire_info_arr[1:]:
+                    blog_info = json.loads(info['blog_info'])[0]
+                    blog_info = blog_info['fields']
+                    print(blog_info)
+
+                return True
+            else:    
+                print('[SERVER]', header_data['message'])
+                return False
+
+        print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] get_analyzed_info exception occured.\n', e)
+

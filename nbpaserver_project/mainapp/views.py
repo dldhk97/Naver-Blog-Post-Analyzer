@@ -28,6 +28,31 @@ def get_analyzed_info(request):
 # 키워드 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
 def get_keywords(request):
+    if request.method == 'POST':
+    
+        json_array = json.loads(request.body)
+
+        result = core_task.get_keywords(json_array)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
+    pass
+
+# 블로그 정보(미리보기) 요청 시
+@method_decorator(csrf_exempt, name='dispatch')
+def get_keywords(request):
+    if request.method == 'POST':
+    
+        json_array = json.loads(request.body)
+
+        result = core_task.get_bloginfo(json_array)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
     pass
 
 @method_decorator(csrf_exempt, name='dispatch')

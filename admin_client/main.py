@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # 관리자 인증
     if simple_cli.admin_authorization():
     
-        exit_code = simple_cli.cli_loop()
+        exit_code = simple_cli.main_loop(simple_cli.MENU_DICTS)
     else:
         print('관리자 인증에 실패하였습니다.')
         exit_code = 0;

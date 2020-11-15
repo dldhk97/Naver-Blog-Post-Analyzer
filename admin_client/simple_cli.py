@@ -1,40 +1,63 @@
 import core_task
 
-# 프린트 메뉴 코드
-def print_menu():
-    print('1. 모듈 로드')
-    print('2. 로렘 분석')
-    print('3. 검색어로 크롤링하기')
-    print('4. URL로 한 게시글 크롤링하기')
-    print('5. URL로 한 게시글 멀티미디어 크롤링하기')
-    print('6. url 전송하여 분석결과 반환')
-    print('q. 종료')
+CLIENT_FUNCS = [
+    [core_task.get_analyzed_info, '게시글 분석 정보 보기'],
+    [core_task.get_keywords, '게시글 키워드 미리보기'],
+    [core_task.get_bloginfo, '게시글 미리보기'],
+    [None, '피드백 남기기'],
+]
+ADMIN_FUNCS = [
+    [None, '피드백 조회'],
+    [None, '피드백 삭제'],
+    [None, '피드백 저장'],
+    [None, 'Ban IP'],
+    [None, 'Ban IP 조회'],
+    [None, 'Unban IP'],
+    [None, '모델 학습'],
+    [None, '모델 불러오기'],
+    [None, '모델 저장하기'],
+]
+TEST_FUNCS = [
+    [core_task.load_module, '모듈 로드'],
+    [core_task.lorem_analyze, '로렘 분석'],
+    [core_task.crawl_by_search_word, '검색어로 크롤링하기'],
+    [core_task.crawl_single_post, 'URL로 한 게시글 크롤링하기'],
+    [core_task.crawl_multimedia, 'URL로 한 게시글 멀티미디어 크롤링하기'],
+    [core_task.get_analyzed_info, 'URL 목록 전송하여 분석결과 반환'],
+]
 
+MENU_DICTS = [
+    [CLIENT_FUNCS, '클라이언트 메뉴 보기'],
+    [ADMIN_FUNCS, '관리자 메뉴 보기'],
+    [TEST_FUNCS, '테스트 메뉴 보기'],
+]
 
-def cli_loop():
+def main_loop(funcs):
     while True:
-        print_menu()
+        print(' ')
+        i = 1
+        for d in funcs:
+            print(str(i) + '. ' + d[1])
+            i += 1
+        print('q. 나가기')
+
         user_input = input('메뉴 선택 : ')
-        if user_input == '1':
-            core_task.load_module()
-
-        elif user_input == '2':
-            core_task.lorem_analyze()
-
-        elif user_input == '3':
-            core_task.crawl_by_search_word()
-
-        elif user_input == '4':
-            core_task.crawl_single_post()
-
-        elif user_input == '5':
-            core_task.crawl_multimedia()
-
-        elif user_input == '6':
-            core_task.get_analyzed_info()
-
-        elif user_input == 'q':
+        if user_input == 'q':
             return 0
+        
+
+        try:
+            user_input = int(user_input) - 1
+            selected_funcs = funcs[user_input][0]
+
+            if callable(selected_funcs):
+                selected_funcs()
+            else:
+                main_loop(selected_funcs)
+
+        except Exception as e:
+            print('[SYSTEM][main_loop]', e)
+            # return -1
         
 def admin_authorization():
     print('관리자용 클라이언트 사용을 위해 로그인이 필요합니다.')
