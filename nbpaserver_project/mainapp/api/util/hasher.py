@@ -1,5 +1,5 @@
-
 import hashlib
+
 def get_hash_value(in_str, in_digest_bytes_size=64, in_return_type='digest'):
     """해시값을 구한다 
     Parameter: in_str: 해싱할문자열, in_digest_bytes_size: Digest바이트크기, 

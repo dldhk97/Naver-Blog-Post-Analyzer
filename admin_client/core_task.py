@@ -80,57 +80,14 @@ def lorem_analyze(sents):
     except Exception as e:
         print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
-def crawl_by_search_word(word, post_count):
-    request_url = HOST_URL_HEAD + 'admin/test/crawlbysearchword'
-
-    try:
-        data = {}
-        data['search_word'] = word
-        data['blog_post_count'] = post_count
-        
-        json_data = json.dumps(data)
-        
-        response = requests.post(request_url, data=json_data)
-        
-        if response.status_code == 200 or response.status_code == 200:
-            json_data = json.loads(response.text)
-            if json_data['success'] == 'True':
-                pass
-            else:    
-                print('[SERVER]', json_data['message'])
-
-        print('[CLEINT][core_task] Crawl_by_search_word error occured! Status_code is not 200 or 201!')
-    except Exception as e:
-        print('[CLEINT][core_task] Crawl_by_search_word exception occured.\n', e)
-        
-
-def crawl_single_post(url):
-    if url is not None:
-        # naver_blog_post_crawler.crawl_single_post(url)
-        print('Deprecated method.')
-    else:
-        print('URL이 올바르지 않습니다.')
-
-def crawl_multimedia(url):
-    print('Deprecated method.')
-    # images_ratio, imos_ratio, videos_ratio, hyperlinks_ratio, etcs_ratio, texts_ratio, blanks_ratio = multimediacrawler.get_multimedia(url)
-    
-    # 멀티미디어 종류별 비율 표시
-    # print('이미지의 비율 : ', str(round(images_ratio, 3) * 100), '%')
-    # print('이모티콘의 비율 : ', str(round(imos_ratio, 3) * 100), '%')
-    # print('비디오의 비율 : ', str(round(videos_ratio, 3) * 100), '%')
-    # print('하이퍼링크 비율 : ', str(round(hyperlinks_ratio, 3) * 100), '%')
-    # print('기타(iframe) 비율 : ', str(round(etcs_ratio, 3) * 100), '%')
-    # print('텍스트 비율 : ', str(round(texts_ratio, 3) * 100), '%')
-    # print('공백 비율 : ', str(round(blanks_ratio, 3) * 100), '%')
-    pass
-
 def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords):
-    blog_info = blog_info['fields']
-    print(blog_info)
+    if blog_info:
+        blog_info = blog_info['fields']
+        print(blog_info)
 
-    analyzed_info = analyzed_info['fields']
-    print(analyzed_info)
+    if analyzed_info:
+        analyzed_info = analyzed_info['fields']
+        print(analyzed_info)
 
     for multimedia_ratio in multimedia_ratios:
         mr = multimedia_ratio['fields']
@@ -167,15 +124,21 @@ def get_analyzed_info(data_list):
             header_data = blog_entire_info_arr[0]
                 
             if header_data['success'] == 'True':
-                
                 for info in blog_entire_info_arr[1:]:
+                    analyzed_info = None
+                    multimedia_ratios = None
+                    keywords = None
                     blog_info = json.loads(info['blog_info'])[0]
-                    analyzed_info = json.loads(info['analyzed_info'])[0]
-                    multimedia_ratios = json.loads(info['multimedia_ratios'])
+                    if 'analyzed_info' in info:
+                        analyzed_info = json.loads(info['analyzed_info'])[0]
+                        
+                    if 'multimedia_ratios' in info:
+                        multimedia_ratios = json.loads(info['multimedia_ratios'])
                     
                     tags = json.loads(info['tags'])
                     hyperlinks = json.loads(info['hyperlinks'])
-                    keywords = json.loads(info['keywords'])
+                    if 'keywords' in info:
+                        keywords = json.loads(info['keywords'])
                     
                     print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords)
                     

@@ -1,7 +1,9 @@
 from ... import models
 
-# 크롤러에서 사용하는 BlogPost 객체를 BlogInfo, BlogInfo배열, Dictionary배열로 분리하여 반환
 def blog_post_to_django_model(blog_post):
+    '''
+    크롤러에서 사용하는 BlogPost 객체를 BlogInfo, BlogInfo배열, Dictionary배열로 분리하여 반환
+    '''
     hyperlink_dict = []
     tag_dict = []
 

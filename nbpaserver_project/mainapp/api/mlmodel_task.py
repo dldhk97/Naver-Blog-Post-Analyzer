@@ -1,4 +1,4 @@
-from .analyzer.lorem_analyzer import load_module as analyzer_load_module
+from .analyzer import lorem_analyzer
 
 def mlload_module():
     print('[SYSTEM][model_task] Start loading module.')
@@ -7,7 +7,7 @@ def mlload_module():
     response['task_type'] = 'load_module'
     
     try:
-        analyzer_load_module()
+        lorem_analyzer.load_module()
         print('[SYSTEM][model_task] Load module successful.')
         
         response['success'] = 'True'

@@ -83,8 +83,7 @@ def get_distance(sentence):
             prob = prob_arr[0][cnt][i].item()
 
             if cur_tok_idx == vocab[word]:
-                print(word)
-                print(format(prob, "10.6%"))
+                print(word + '(' + str(format(prob, "10.6%")).strip() + ')')
 
                 result_tok_list.append(word)
                 result_prob_list.append(prob)
