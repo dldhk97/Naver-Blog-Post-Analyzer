@@ -165,11 +165,10 @@ def task_callback(result_tuple):
     for t in RUNNING_TASK:
         if is_same_task(task, t):
             remove_target = t
-            print('remove_target found')
     
     if remove_target:
         RUNNING_TASK.remove(remove_target)
-        print('remove_target removed')
+        print('Task (' + str(task) + ') removed from queue')
 
 def runner(request_queue):
     print('runner run!')
@@ -186,6 +185,7 @@ def runner(request_queue):
             for task in RUNNING_TASK:
                 if is_same_task(requested_task, task):
                     same_task_exists = True
+                    print('same task already running!')
                     break
             
             if not same_task_exists:

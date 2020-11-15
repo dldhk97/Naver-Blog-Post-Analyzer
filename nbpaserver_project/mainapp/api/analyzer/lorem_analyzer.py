@@ -1,14 +1,15 @@
-import torch
-import numpy
+import torch, numpy, random
 from .kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
 from gluonnlp.data import SentencepieceTokenizer
 from .kogpt2.utils import get_tokenizer
 
 from sklearn.preprocessing import MinMaxScaler
 
-
-MAX_WORD_LEN = 100	# 2번, 문장 생성 기능시 무한루프 방지용 최대단어개수
 VOCAB_SIZE = 50000
+
+ZERO_CONVERGENCE_LIMIT = 0.05
+MIN_SENTNCE_LENGTH = 10
+SAMPLES_NUMBER = 3
 
 model = None
 vocab = None
@@ -25,29 +26,6 @@ def load_module():
         tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
 
 
-def org_craete_sent(sent):
-    global model, vocab, tok
-    
-    if model is None:
-        print('[SYSTEM][Analyzer] Load module before use gpt2.')
-        return None
-
-    toked = tok(sent)
-    cnt = 0
-    while 1:
-        input_ids = torch.tensor([vocab[vocab.bos_token],]  + vocab[toked]).unsqueeze(0)
-        pred = model(input_ids)[0]
-        gen = vocab.to_tokens(torch.argmax(pred, axis=-1).squeeze().tolist())[-1]
-        if gen == '</s>':
-            break
-        elif cnt == MAX_WORD_LEN:
-            print('MAX_WORD_LEN ERROR')
-            break
-        sent += gen.replace('▁', ' ')
-        toked = tok(sent)
-        cnt += 1
-    return sent
-
 # Analyze lorem and get distance(rank) vector
 def get_distance(sentence):
     global model, vocab, tok
@@ -59,8 +37,12 @@ def get_distance(sentence):
     result_tok_list = []
     result_prob_list = []
     splited = tok(sentence)
+
+    # 토큰이 너무 많으면 자른다...
+    splited = splited[:100]
+
     toked = splited[:1]   # 첫 녀석을 일단 토큰화
-    print(toked)
+    # print(toked)
 
     # 두번째 녀석부터 한번씩 word 변수에 담아 반복
     for word in splited[1:]:
@@ -93,6 +75,7 @@ def get_distance(sentence):
 
         if not did_you_find:
             print('I cant find. ' + word)
+            pass
         
         cnt += 1          # 다음 단어를 분석하기위해 cnt +1
 
@@ -101,14 +84,57 @@ def get_distance(sentence):
 
     return result_tok_list, result_prob_list  # 거리가 저장된 배열 반환
 
+def get_lorem_percentage(sentence):
+    lorem_probs = []
+
+    # 개행으로 최소 문자수보다 많은 줄만 추출
+    available_lines = []
+    for s in sentence.split('\n'):
+        if len(s) >= MIN_SENTNCE_LENGTH:
+            available_lines.append(s)
+    # 추출된 줄이 전혀 없으면 에러 반환
+    if len(available_lines) <= 0:
+        return -1
+
+    # N개 랜덤 추출
+    if len(available_lines) >= SAMPLES_NUMBER:
+        random_samples = random.sample(available_lines, SAMPLES_NUMBER)
+    else:
+        random_samples = available_lines
+    
+    for s in random_samples:
+        if len(s) <= 0:
+            continue
+        print('[lorem_analyzer] get_distance started')
+        result_tok_list, result_prob_list = get_distance(s)
+        print('[lorem_analyzer] get_distance done')
+        zero_convergence = []
+        for i in range(len(result_tok_list)):
+            tok = result_tok_list[i]
+            prob = result_prob_list[i]
+            if prob <= ZERO_CONVERGENCE_LIMIT:
+                zero_convergence.append([tok, prob])
+
+        len_probs = len(result_prob_list)
+        len_zero_convergence = len(zero_convergence)
+        # print('총 토큰 수 : ' + str(len_probs))
+        # print('총 zero_convergence 수 : ' + str(len_zero_convergence))
+        lorem_prob = len_zero_convergence / len_probs
+        lorem_probs.append(lorem_prob)
+
+    if lorem_probs:
+        lorem_percentage = numpy.mean(lorem_probs)
+        return lorem_percentage
+    return -1
+
 # 거리 배열, 평균값, 분산, 표준편차 내기
-def distance_describe(distances):
+def distance_describe(probs):
     # 평균값 내보기
-    mean = numpy.mean(distances)
+    mean = numpy.mean(probs)
     # 분산 내보기
-    variance = numpy.var(distances)
+    variance = numpy.var(probs)
     # 표준편차 구하기
-    standard_deviation = numpy.std(distances)
+    standard_deviation = numpy.std(probs)
 
     return mean, variance, standard_deviation
 

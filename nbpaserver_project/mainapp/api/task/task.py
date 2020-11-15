@@ -14,3 +14,5 @@ class Task:
         self._url = url
         self._dict = {}
         
+    def __str__(self):
+        return str(self._task_type) + ', ' + str(self._blog_id) + ', ' + str(self._log_no)

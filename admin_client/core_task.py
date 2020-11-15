@@ -89,21 +89,25 @@ def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hy
         analyzed_info = analyzed_info['fields']
         print(analyzed_info)
 
-    for multimedia_ratio in multimedia_ratios:
-        mr = multimedia_ratio['fields']
-        print(mr)
+    if multimedia_ratios:
+        for multimedia_ratio in multimedia_ratios:
+            mr = multimedia_ratio['fields']
+            print(mr)
 
-    for tag in tags:
-        t = tag['fields']
-        print(t)
+    if tags:
+        for tag in tags:
+            t = tag['fields']
+            print(t)
 
-    for hyperlink in hyperlinks:
-        h = hyperlink['fields']
-        print(h)
+    if hyperlinks:
+        for hyperlink in hyperlinks:
+            h = hyperlink['fields']
+            print(h)
 
-    for keyword in keywords:
-        k = keyword['fields']
-        print(k)
+    if keywords:
+        for keyword in keywords:
+            k = keyword['fields']
+            print(k)
 
     pass
 
