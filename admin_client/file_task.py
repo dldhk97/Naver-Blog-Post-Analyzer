@@ -47,10 +47,9 @@ def save_as_csv(feedback_list, save_directory):
                     print(str(pk) + ' 저장 완료')
             except Exception as ex:
                 print(ex)
-        print('모든 게시물 저장 성공!')
+        print('모든 피드백을 저장하였습니다! (경로 : ' + save_path + file_name + ')')
         f.close
     except Exception as e:
-        print("Failed to save text file : ")
-        print(e)
+        print("Failed to save csv file : ", e)
 
     return

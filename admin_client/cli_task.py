@@ -135,9 +135,9 @@ def get_feedback(user_input=True):
     feedback_type_name = None
 
     if user_input:
-        id = input('ID (없어도 무관): ')
-        ip = input('IP (없어도 무관): ')
-        feedback_type_name = select_feedback_type('피드백 선택(없어도 무관):')
+        id = input('ID (없으면 필터링하지 않음): ')
+        ip = input('IP (없으면 필터링하지 않음): ')
+        feedback_type_name = select_feedback_type('피드백 선택(없으면 필터링하지 않음):')
     
     if feedback_type_name == FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]:
         feedback_type_name = None
@@ -163,7 +163,7 @@ def delete_feedback(feedbacks):
 def save_feedback_as_csv(feedbacks):
     user_input = input('조회된 모든 피드백을 CSV로 저장하시겠습니까?(Y/N)')
     if (user_input == 'y') or (user_input == 'Y'):
-        save_directory = input('저장할 경로를 입력해주세요(없어도 됨) : ')
+        save_directory = input('저장할 경로를 입력해주세요(없으면 기본 경로에 저장) : ')
         if save_directory == '':
             save_directory = None
         core_task.save_feedback_as_csv(feedbacks, save_directory)
@@ -179,8 +179,8 @@ def manage_feedback():
             print(str(i) + '. ' + str(f))
             i += 1
 
-        print('1) 피드백 삭제')
-        print('2) 피드백 CSV로 저장')
+        print('1) 조회된 피드백 삭제')
+        print('2) 조회된 피드백 CSV 파일로 저장')
         print('q) 나가기')
         
         user_input = input('선택 : ')
@@ -197,8 +197,8 @@ def get_banned_user(user_input=True):
     ip = None
 
     if user_input:
-        id = input('ID (없어도 무관): ')
-        ip = input('IP (없어도 무관): ')
+        id = input('ID (없으면 필터링하지 않음): ')
+        ip = input('IP (없으면 필터링하지 않음): ')
 
         if id is '':
             id = None
@@ -235,8 +235,8 @@ def manage_ban():
             print(str(i) + '. ' + str(b))
             i += 1
 
-        print('1) Ban IP')
-        print('2) Unban IP')
+        print('1) 새로 Ban IP')
+        print('2) 조회된 목록 Unban IP')
         print('q) 나가기')
         
         user_input = input('선택 : ')
