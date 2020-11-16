@@ -65,21 +65,24 @@ def fetch_dictionary(blog_info, dictionary_type_name):
 
     return list(dicts)
 
-def fetch_feedback(ip=None, feedback_type_name=None):
+def fetch_feedback(id=None, ip=None, feedback_type_name=None):
     feedback_type = None
     if feedback_type_name:
         feedback_type = models.FeedbackType.objects.filter(name=feedback_type_name)[0]
-    
-    feedbacks = None
-    if ip and feedback_type:
-        feedbacks = models.Feedback.objects.filter(ip=ip, feedback_type=feedback_type)
-    elif ip:
-        feedbacks = models.Feedback.objects.filter(ip=ip)
-    elif feedback_type:
-        feedbacks = models.Feedback.objects.filter(feedback_type=feedback_type)
+
+    if id:
+        feedbacks = models.Feedback.objects.filter(id=id)
     else:
-        feedbacks = models.Feedback.objects.all()
-    
+        feedbacks = None
+        if ip and feedback_type:
+            feedbacks = models.Feedback.objects.filter(ip=ip, feedback_type=feedback_type)
+        elif ip:
+            feedbacks = models.Feedback.objects.filter(ip=ip)
+        elif feedback_type:
+            feedbacks = models.Feedback.objects.filter(feedback_type=feedback_type)
+        else:
+            feedbacks = models.Feedback.objects.all()
+        
     return list(feedbacks)
 
 def fetch_blog_info(target_url):

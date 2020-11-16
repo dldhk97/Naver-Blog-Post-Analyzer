@@ -216,6 +216,7 @@ def get_bloginfo(url):
     except Exception as e:
         print('[CLEINT][core_task] get_bloginfo exception occured.\n', e)
 
+
 def send_feedback(url, ip, feedback_type, message):
     '''
     url, ip, 피드백 타입, 메시지 등을 서버로 보내 피드백테이블에 저장하게 함.
@@ -248,7 +249,7 @@ def send_feedback(url, ip, feedback_type, message):
     except Exception as e:
         print('[CLEINT][core_task] send_feedback exception occured.\n', e)
 
-def get_feedback(ip=None, feedback_type_name=None):
+def get_feedback(id=None, ip=None, feedback_type_name=None):
     '''
     ip, 피드백 유형으로 피드백 조회
     '''
@@ -256,6 +257,8 @@ def get_feedback(ip=None, feedback_type_name=None):
 
     try:    
         data = {}
+        if id:
+            data['id'] = id
         if ip:
             data['ip'] = ip
         
@@ -271,15 +274,42 @@ def get_feedback(ip=None, feedback_type_name=None):
                 
             if response_data['success'] == 'True':
                 feedbacks = json.loads(response_data['feedbacks'])
-                
-                for feedback in feedbacks:
-                    print(feedback)
+                return feedbacks
+            else:    
+                print('[SERVER]', response_data['message'])
+                return None
 
+        print('[CLEINT][core_task] get_feedback error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] get_feedback exception occured.\n', e)
+
+def delete_feedback(feedbacks):
+    '''
+    피드백 id로 조회된 모든 피드백 삭제
+    '''
+    request_url = HOST_URL_HEAD + 'admin/feedback/delete'
+
+    try:    
+        if not feedbacks:
+            return
+
+        data = {}
+        data['feedbacks'] = feedbacks
+
+        json_data = json.dumps(data)
+            
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            response_data = json.loads(response.text)
+                
+            if response_data['success'] == 'True':
+                print('[SERVER]', response_data['message'])
                 return True
             else:    
                 print('[SERVER]', response_data['message'])
                 return False
 
-        print('[CLEINT][core_task] send_feedback error occured! Status_code is not 200 or 201!')
+        print('[CLEINT][core_task] get_feedback error occured! Status_code is not 200 or 201!')
     except Exception as e:
-        print('[CLEINT][core_task] send_feedback exception occured.\n', e)
+        print('[CLEINT][core_task] get_feedback exception occured.\n', e)

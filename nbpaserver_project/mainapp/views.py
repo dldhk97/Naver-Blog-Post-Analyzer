@@ -86,7 +86,16 @@ def get_feedbacks(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def delete_feedback(request):
-    pass
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.delete_feedback(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
 
 ################################
 # Ban

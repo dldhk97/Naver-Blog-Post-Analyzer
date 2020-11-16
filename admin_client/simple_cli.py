@@ -7,7 +7,7 @@ CLIENT_FUNCS = [
     [cli_task.send_feedback, '피드백 남기기'],
 ]
 ADMIN_FUNCS = [
-    [cli_task.get_feedback, '피드백 조회'],
+    [cli_task.manage_feedback, '피드백 관리'],
     [None, '피드백 삭제'],
     [None, '피드백 저장'],
     [None, 'Ban IP'],

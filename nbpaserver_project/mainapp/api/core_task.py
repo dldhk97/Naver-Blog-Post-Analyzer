@@ -139,7 +139,7 @@ def get_keyword(json_data):
         else : 
             response_data['message'] = '키워드 정보를 추출하는 중입니다.'
     except Exception as e:
-        print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+        print('[SYSTEM][core_task][get_keyword]\n', e)
 
     return response_data
 
@@ -218,14 +218,20 @@ def get_feedback(json_data):
     response_data['message'] = '피드백 정보를 불러오는 중 알 수 없는 오류 발생!'
 
     try:
+        id = None
         ip = None
+        feedback_type_name = None
+        
+        if 'id' in json_data:
+            id = json_data['id']
+        
         if 'ip' in json_data:
             ip = json_data['ip']
-        feedback_type_name = None
+        
         if 'feedback_type_name' in json_data:
             feedback_type_name = json_data['feedback_type_name']
         
-        feedback_list = fetch_feedback(ip, feedback_type_name)
+        feedback_list = fetch_feedback(id=id, ip=ip, feedback_type_name=feedback_type_name)
         
         if len(feedback_list) > 0:
             response_data['feedbacks'] = serializers.serialize('json', feedback_list)
@@ -235,7 +241,41 @@ def get_feedback(json_data):
             response_data['message'] = '피드백 정보가 없습니다.'
         
     except Exception as e:
-        print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
-        pass
+        print('[SYSTEM][core_task][get_feedback]', e)
+
+    return response_data
+
+def delete_feedback(json_data):
+    response_data = {}
+    response_data['success'] = 'False'
+    response_data['message'] = '피드백을 삭제하는 중 알 수 없는 오류 발생!'
+
+    try:
+        feedbacks = None
+        if not 'feedbacks' in json_data:
+            response_data['message'] = '삭제할 피드백 목록이 비어있습니다.'
+            return 
+
+        # 클라이언트에게서 삭제할 피드백 목록을 받음.
+        feedbacks = json_data['feedbacks']
+        
+        # 역직렬화함.
+        feedback_list = []
+        for f in feedbacks:
+            feedback = fetch_feedback(id=f['pk'])[0]
+            feedback_list.append(feedback)
+
+        if len(feedback_list) > 0:
+            
+            # 피드백 삭제
+            for f in feedback_list:
+                f.delete()
+            response_data['success'] = 'True'
+            response_data['message'] = '피드백 정보 삭제하였음.'
+        else : 
+            response_data['message'] = '삭제할 피드백 정보를 찾지 못했습니다.'
+        
+    except Exception as e:
+        print('[SYSTEM][core_task][delete_feedback]', e)
 
     return response_data

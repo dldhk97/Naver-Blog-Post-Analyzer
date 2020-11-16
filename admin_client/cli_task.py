@@ -130,13 +130,49 @@ def crawl_multimedia():
     core_task.crawl_multimedia()
 
 def get_feedback():
+    id = input('ID (없어도 무관): ')
     ip = input('IP (없어도 무관): ')
     feedback_type_name = select_feedback_type('피드백 선택(없어도 무관):')
     
     if feedback_type_name == FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]:
         feedback_type_name = None
 
+    if id is '':
+        id = None
+
     if ip is '':
         ip = None
     
-    core_task.get_feedback(ip, feedback_type_name)
+    # 피드백을 서버로부터 가져옴
+    feedbacks = core_task.get_feedback(id, ip, feedback_type_name)
+    return feedbacks
+
+def delete_feedback(feedbacks):
+    user_input = input('조회된 모든 피드백을 삭제하시겠습니까?(Y/N)')
+    if (user_input == 'y') or (user_input == 'Y'):
+        core_task.delete_feedback(feedbacks)
+
+def manage_feedback():
+    feedbacks = get_feedback()
+    if not feedbacks:
+        print('조회된 피드백이 없습니다.')
+        return
+
+    while True:
+        i = 1
+        for f in feedbacks:
+            print('(' + str(i) + ') ' + str(f))
+            i += 1
+
+        print('1) 피드백 삭제')
+        print('2) 피드백 CSV로 저장')
+        print('q) 나가기')
+        
+        user_input = input('선택 : ')
+        if user_input == '1':
+            delete_feedback(feedbacks)
+            return
+        elif user_input == '2':
+            pass
+        elif user_input == 'q':
+            return
