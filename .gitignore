@@ -139,3 +139,6 @@ constants.py
 
 # idea
 .idea/
+
+# feedbacks
+admin_client/feedbacks

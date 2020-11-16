@@ -151,6 +151,14 @@ def delete_feedback(feedbacks):
     user_input = input('조회된 모든 피드백을 삭제하시겠습니까?(Y/N)')
     if (user_input == 'y') or (user_input == 'Y'):
         core_task.delete_feedback(feedbacks)
+        
+def save_feedback_as_csv(feedbacks):
+    user_input = input('조회된 모든 피드백을 CSV로 저장하시겠습니까?(Y/N)')
+    if (user_input == 'y') or (user_input == 'Y'):
+        save_directory = input('저장할 경로를 입력해주세요(없어도 됨) : ')
+        if save_directory == '':
+            save_directory = None
+        core_task.save_feedback_as_csv(feedbacks, save_directory)
 
 def manage_feedback():
     feedbacks = get_feedback()
@@ -173,6 +181,7 @@ def manage_feedback():
             delete_feedback(feedbacks)
             return
         elif user_input == '2':
-            pass
+            save_feedback_as_csv(feedbacks)
+            return
         elif user_input == 'q':
             return

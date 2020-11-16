@@ -8,8 +8,6 @@ CLIENT_FUNCS = [
 ]
 ADMIN_FUNCS = [
     [cli_task.manage_feedback, '피드백 관리'],
-    [None, '피드백 삭제'],
-    [None, '피드백 저장'],
     [None, 'Ban IP'],
     [None, 'Ban IP 조회'],
     [None, 'Unban IP'],

@@ -1,5 +1,6 @@
 import requests, json
 import constants
+import file_task
 
 HOST_IP = constants.ServerInfo.CONNECTION_INFO['default']['HOST']
 HOST_PORT = constants.ServerInfo.CONNECTION_INFO['default']['PORT']
@@ -313,3 +314,6 @@ def delete_feedback(feedbacks):
         print('[CLEINT][core_task] get_feedback error occured! Status_code is not 200 or 201!')
     except Exception as e:
         print('[CLEINT][core_task] get_feedback exception occured.\n', e)
+
+def save_feedback_as_csv(feedbacks, save_directory=None):
+    file_task.save_as_csv(feedbacks, save_directory)
