@@ -9,8 +9,23 @@ FEEDBACK_TYPE = [
     'low_ratio',
     'high_ratio',
     'etc',
-    'unknown'
+    'unknown',
+    '나가기'
 ]
+
+def select_feedback_type(msg='Select feedback type.'):
+    print(msg)
+    i = 1
+    for type in FEEDBACK_TYPE:
+        print(str(i) + ') ' + type)
+        i += 1
+
+    try:
+        user_input = int(input('feedback_type : ')) - 1
+        feedback_type = FEEDBACK_TYPE[user_input]
+        return feedback_type
+    except Exception as e:
+        return FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]
 
 def admin_authorization():
     print('관리자용 클라이언트 사용을 위해 로그인이 필요합니다.')
@@ -61,18 +76,14 @@ def get_bloginfo():
 def send_feedback():
     url = input('url : ')
     ip = input('ip : ')
-    
-    print('Select feedback type.')
-    i = 1
-    for type in FEEDBACK_TYPE:
-        print(str(i) + ') ' + type)
-        i += 1
 
-    user_input = int(input('feedback_type : ')) - 1
-    feedback_type = FEEDBACK_TYPE[user_input]
+    feedback_type_name = select_feedback_type()
+    if feedback_type_name == FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]:
+        print('취소하였습니다.')
+        return
     message = input('message : ')
 
-    core_task.send_feedback(url, ip, feedback_type, message)
+    core_task.send_feedback(url, ip, feedback_type_name, message)
 
 def load_module():
     user_input = input('KoGPT2 모듈을 로드하겠습니까?(Y/N)')
@@ -117,3 +128,15 @@ def crawl_multimedia():
         return
 
     core_task.crawl_multimedia()
+
+def get_feedback():
+    ip = input('IP (없어도 무관): ')
+    feedback_type_name = select_feedback_type('피드백 선택(없어도 무관):')
+    
+    if feedback_type_name == FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]:
+        feedback_type_name = None
+
+    if ip is '':
+        ip = None
+    
+    core_task.get_feedback(ip, feedback_type_name)

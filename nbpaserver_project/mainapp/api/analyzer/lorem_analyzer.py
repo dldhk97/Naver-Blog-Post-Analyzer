@@ -26,8 +26,8 @@ def load_module():
         tok = SentencepieceTokenizer(tok_path,  num_best=0, alpha=0)
 
 
-# Analyze lorem and get distance(rank) vector
-def get_distance(sentence):
+# Analyze get probablities vector
+def get_probablities(sentence):
     global model, vocab, tok
 
     if model is None:
@@ -105,9 +105,9 @@ def get_lorem_percentage(sentence):
     for s in random_samples:
         if len(s) <= 0:
             continue
-        print('[lorem_analyzer] get_distance started')
-        result_tok_list, result_prob_list = get_distance(s)
-        print('[lorem_analyzer] get_distance done')
+        print('[lorem_analyzer] get_probablities started')
+        result_tok_list, result_prob_list = get_probablities(s)
+        print('[lorem_analyzer] get_probablities done')
         zero_convergence = []
         for i in range(len(result_tok_list)):
             tok = result_tok_list[i]

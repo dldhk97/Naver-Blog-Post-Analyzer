@@ -23,7 +23,6 @@ def get_analyzed_info(request):
         return JsonResponse(result, safe=False)
     
     print('[SYSTEM]Do not handle get request.')
-    pass
 
 # 키워드 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
@@ -38,7 +37,6 @@ def get_keyword(request):
         return JsonResponse(result, safe=False)
     
     print('[SYSTEM]Do not handle get request.')
-    pass
 
 # 블로그 정보(미리보기) 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
@@ -53,7 +51,6 @@ def get_bloginfo(request):
         return JsonResponse(result, safe=False)
     
     print('[SYSTEM]Do not handle get request.')
-    pass
 
 # 피드백 생성시
 @method_decorator(csrf_exempt, name='dispatch')
@@ -68,7 +65,6 @@ def send_feedback(request):
         return JsonResponse(result, safe=False)
     
     print('[SYSTEM]Do not handle get request.')
-    pass
 
 ################################
 #          admin views         #
@@ -77,7 +73,16 @@ def send_feedback(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def get_feedbacks(request):
-    pass
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.get_feedback(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
 
 @method_decorator(csrf_exempt, name='dispatch')
 def delete_feedback(request):

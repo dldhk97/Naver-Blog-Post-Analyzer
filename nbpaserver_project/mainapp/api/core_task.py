@@ -9,7 +9,7 @@ from .crawler.util import url_normalization
 from .crawler import naverblogcrawler
 from .util import model_converter
 from .task.task import Task, TaskType
-from .task.task_manager import TaskManager, fetch_dictionary, fetch_dictionary_type, fetch_blog_info
+from .task.task_manager import *
 from .task.bloginfo_task import bloginfo_task
 
 # 분석, 키워드 추출 등 핵심 메소드
@@ -122,31 +122,22 @@ def get_keyword(json_data):
         if blog_info is None:
             response_data['message'] = 'DB에 블로그 데이터가 존재하지 않습니다!'
             return response_data
-    
-        keyword_future = None
 
         # 테이블 조회하고 정보가 없으면 작업 목록에 추가함.
         keyword_list = fetch_dictionary(blog_info, 'keyword')
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            if len(keyword_list) <= 0:
-                print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
-                # keyword_future = executor.submit(core_job.keyword_job, blog_info)
-
-        # 멀티프로세싱이 끝나면, 각 정보들을 DB에 넣을 수 있게 모델 변환 후 저장
-        if keyword_future:
-            keyword_list = []
-            for word in keyword_future.result():
-                dict_type = fetch_dictionary_type('keyword')
-                converted_keyword = model_converter.dictionary_to_django_model(blog_info, word, dict_type)
-                converted_keyword.save()
-                keyword_list.append(converted_keyword)
-            if len(keyword_list) > 0:
-                print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
+        if len(keyword_list) <= 0:
+            print('[SYSTEM][core_task] Keywords(' + blog_info.blog_id +', ' + blog_info.log_no + ') does not exists in database!')
+            task = Task(TaskType.KEYWORD, blog_info.blog_id, blog_info.log_no, blog_info.url)
+            task._dict['body'] = blog_info.body
+            TaskManager.instance().add_task(task)
         
-        response_data['keywords'] = serializers.serialize('json', keyword_list)
-        response_data['success'] = 'True'
-        response_data['message'] = '키워드 정보 로드하였음.'
+        if len(keyword_list) > 0:
+            response_data['keywords'] = serializers.serialize('json', keyword_list)
+            response_data['success'] = 'True'
+            response_data['message'] = '키워드 정보 로드하였음.'
+        else : 
+            response_data['message'] = '키워드 정보를 추출하는 중입니다.'
     except Exception as e:
         print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
 
@@ -183,24 +174,24 @@ def get_bloginfo(json_data):
     return response_data
 
 def send_feedback(json_data):
-    response = {}
-    response['success'] = 'False'
-    response['message'] = '블로그 정보를 불러오는 중 알 수 없는 오류 발생!'
+    response_data = {}
+    response_data['success'] = 'False'
+    response_data['message'] = '블로그 정보를 불러오는 중 알 수 없는 오류 발생!'
 
     try:
         target_url = json_data['url']
 
         if 'blog.naver.com' not in target_url:
-            response['message'] = '네이버 블로그가 아닙니다!'
-            return response
+            response_data['message'] = '네이버 블로그가 아닙니다!'
+            return response_data
 
         target_url = url_normalization(target_url)
         
         blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
 
         if blog_info is None:
-            response['message'] = 'DB에 블로그 데이터가 존재하지 않습니다!'
-            return response
+            response_data['message'] = 'DB에 블로그 데이터가 존재하지 않습니다!'
+            return response_data
 
         # 피드백 생성
         feedback = models.Feedback()
@@ -213,14 +204,38 @@ def send_feedback(json_data):
         feedback.message = json_data['message']
 
         feedback.save()
-        response['success'] = 'True'
-        response['message'] = '피드백을 DB에 저장하는데 성공했습니다!'
+        response_data['success'] = 'True'
+        response_data['message'] = '피드백을 DB에 저장하는데 성공했습니다!'
+        
+    except Exception as e:
+        print('[SYSTEM][core_task][send_feedback] FeedbackInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
+
+    return response_data
+
+def get_feedback(json_data):
+    response_data = {}
+    response_data['success'] = 'False'
+    response_data['message'] = '피드백 정보를 불러오는 중 알 수 없는 오류 발생!'
+
+    try:
+        ip = None
+        if 'ip' in json_data:
+            ip = json_data['ip']
+        feedback_type_name = None
+        if 'feedback_type_name' in json_data:
+            feedback_type_name = json_data['feedback_type_name']
+        
+        feedback_list = fetch_feedback(ip, feedback_type_name)
+        
+        if len(feedback_list) > 0:
+            response_data['feedbacks'] = serializers.serialize('json', feedback_list)
+            response_data['success'] = 'True'
+            response_data['message'] = '피드백 정보 로드하였음.'
+        else : 
+            response_data['message'] = '피드백 정보가 없습니다.'
         
     except Exception as e:
         print('[SYSTEM][core_task][fetch_entire_info_from_urls] AnalyzedInfo(' + target_url + ') failed to fetch_entire_info_from_urls.\n', e)
         pass
 
-    return response
-
-    
-
+    return response_data
