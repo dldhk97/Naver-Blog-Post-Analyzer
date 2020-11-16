@@ -11,9 +11,9 @@ urlpatterns = [
     url('admin/feedback/get', views.get_feedbacks, name='admin/feedback/get'),
     url('admin/feedback/delete', views.delete_feedback, name='admin/feedback/delete'),
 
-    url('admin/ban/ban', views.ban_ip, name='admin/ban/ban'),
-    url('admin/ban/get', views.get_banned_ip, name='admin/ban/get'),
-    url('admin/ban/unban', views.unban_ip, name='admin/ban/unban'),
+    url('admin/ban/ban', views.ban_user, name='admin/ban/ban'),
+    url('admin/ban/get', views.get_banned_user, name='admin/ban/get'),
+    url('admin/ban/unban', views.unban_user, name='admin/ban/unban'),
 
     url('admin/model/learn', views.learn_model, name='admin/model/learn'),
     url('admin/model/load', views.load_model, name='admin/model/load'),

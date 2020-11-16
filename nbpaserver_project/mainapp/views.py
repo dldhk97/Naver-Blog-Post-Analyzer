@@ -101,16 +101,43 @@ def delete_feedback(request):
 # Ban
 
 @method_decorator(csrf_exempt, name='dispatch')
-def ban_ip(request):
-    pass
+def ban_user(request):
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.ban_user(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
 
 @method_decorator(csrf_exempt, name='dispatch')
-def get_banned_ip(request):
-    pass
+def get_banned_user(request):
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.get_banned_user(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
 
 @method_decorator(csrf_exempt, name='dispatch')
-def unban_ip(request):
-    pass
+def unban_user(request):
+    if request.method == 'POST':
+        
+        json_data = json.loads(request.body)
+
+        result = core_task.unban_user(json_data)
+
+        # send data to client 
+        return JsonResponse(result, safe=False)
+    
+    print('[SYSTEM]Do not handle get request.')
 
 ################################
 # Model

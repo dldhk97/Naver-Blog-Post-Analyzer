@@ -129,10 +129,15 @@ def crawl_multimedia():
 
     core_task.crawl_multimedia()
 
-def get_feedback():
-    id = input('ID (없어도 무관): ')
-    ip = input('IP (없어도 무관): ')
-    feedback_type_name = select_feedback_type('피드백 선택(없어도 무관):')
+def get_feedback(user_input=True):
+    id = None
+    ip = None
+    feedback_type_name = None
+
+    if user_input:
+        id = input('ID (없어도 무관): ')
+        ip = input('IP (없어도 무관): ')
+        feedback_type_name = select_feedback_type('피드백 선택(없어도 무관):')
     
     if feedback_type_name == FEEDBACK_TYPE[len(FEEDBACK_TYPE) - 1]:
         feedback_type_name = None
@@ -148,6 +153,9 @@ def get_feedback():
     return feedbacks
 
 def delete_feedback(feedbacks):
+    if len(feedbacks) <= 0:
+        print('피드백 목록이 비어있습니다.')
+        return
     user_input = input('조회된 모든 피드백을 삭제하시겠습니까?(Y/N)')
     if (user_input == 'y') or (user_input == 'Y'):
         core_task.delete_feedback(feedbacks)
@@ -161,15 +169,14 @@ def save_feedback_as_csv(feedbacks):
         core_task.save_feedback_as_csv(feedbacks, save_directory)
 
 def manage_feedback():
-    feedbacks = get_feedback()
+    feedbacks = get_feedback(user_input=True)
     if not feedbacks:
         print('조회된 피드백이 없습니다.')
-        return
 
     while True:
         i = 1
         for f in feedbacks:
-            print('(' + str(i) + ') ' + str(f))
+            print(str(i) + '. ' + str(f))
             i += 1
 
         print('1) 피드백 삭제')
@@ -179,9 +186,65 @@ def manage_feedback():
         user_input = input('선택 : ')
         if user_input == '1':
             delete_feedback(feedbacks)
-            return
+            feedbacks = []
         elif user_input == '2':
             save_feedback_as_csv(feedbacks)
-            return
         elif user_input == 'q':
             return
+
+def get_banned_user(user_input=True):
+    id = None
+    ip = None
+
+    if user_input:
+        id = input('ID (없어도 무관): ')
+        ip = input('IP (없어도 무관): ')
+
+        if id is '':
+            id = None
+
+        if ip is '':
+            ip = None
+    
+    #  밴 유저 목록을 서버로부터 가져옴
+    banned_users = core_task.get_banned_user(id, ip)
+    return banned_users
+
+def ban_user():
+    ip = input('ip : ')
+    reason = input('사유 : ')
+    if ip and reason:
+        core_task.ban_user(ip, reason)
+
+def unban_user(banned_users):
+    if len(banned_users) <= 0:
+        print('밴 사용자 목록이 비어있습니다.')
+        return
+    user_input = input('조회된 모든 사용자들을 삭제하시겠습니까?(Y/N)')
+    if (user_input == 'y') or (user_input == 'Y'):
+        core_task.unban_user(banned_users)
+
+def manage_ban():
+    banned_users = get_banned_user(user_input=True)
+    if not banned_users:
+        print('조회된 밴 목록이 없습니다.')
+
+    while True:
+        i = 1
+        for b in banned_users:
+            print(str(i) + '. ' + str(b))
+            i += 1
+
+        print('1) Ban IP')
+        print('2) Unban IP')
+        print('q) 나가기')
+        
+        user_input = input('선택 : ')
+        if user_input == '1':
+            ban_user()
+        elif user_input == '2':
+            unban_user(banned_users)
+        elif user_input == 'q':
+            return
+        
+        banned_users = get_banned_user(user_input=False)

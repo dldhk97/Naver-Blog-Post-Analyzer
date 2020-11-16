@@ -8,9 +8,7 @@ CLIENT_FUNCS = [
 ]
 ADMIN_FUNCS = [
     [cli_task.manage_feedback, '피드백 관리'],
-    [None, 'Ban IP'],
-    [None, 'Ban IP 조회'],
-    [None, 'Unban IP'],
+    [cli_task.manage_ban, 'Ban 사용자 관리'],
     [None, '모델 학습'],
     [None, '모델 불러오기'],
     [None, '모델 저장하기'],

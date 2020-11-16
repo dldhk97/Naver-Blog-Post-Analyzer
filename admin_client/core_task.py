@@ -317,3 +317,97 @@ def delete_feedback(feedbacks):
 
 def save_feedback_as_csv(feedbacks, save_directory=None):
     file_task.save_as_csv(feedbacks, save_directory)
+
+def get_banned_user(id=None, ip=None):
+    '''
+    id, ip로 banned_ip 조회
+    '''
+    request_url = HOST_URL_HEAD + 'admin/ban/get'
+
+    try:    
+        data = {}
+        if id:
+            data['id'] = id
+        if ip:
+            data['ip'] = ip
+
+        json_data = json.dumps(data)
+        
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            response_data = json.loads(response.text)
+                
+            if response_data['success'] == 'True':
+                banned_users = json.loads(response_data['banned_users'])
+                return banned_users
+            else:    
+                print('[SERVER]', response_data['message'])
+                return None
+
+        print('[CLEINT][core_task] get_banned_ip error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] get_banned_ip exception occured.\n', e)
+
+def ban_user(ip, reason):
+    '''
+    ip와 사유를 넣으면 서버로 전송
+    '''
+    request_url = HOST_URL_HEAD + 'admin/ban/ban'
+
+    try:    
+        if not ip:
+            return
+
+        data = {}
+        data['ip'] = ip
+        data['reason'] = reason
+
+        json_data = json.dumps(data)
+            
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            response_data = json.loads(response.text)
+                
+            if response_data['success'] == 'True':
+                print('[SERVER]', response_data['message'])
+                return True
+            else:    
+                print('[SERVER]', response_data['message'])
+                return False
+
+        print('[CLEINT][core_task] ban ip error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] ban ip exception occured.\n', e)
+
+def unban_user(banned_users):
+    '''
+    사용자 목록으로 Unban
+    '''
+    request_url = HOST_URL_HEAD + 'admin/ban/unban'
+
+    try:    
+        if not banned_users:
+            return
+
+        data = {}
+        data['banned_users'] = banned_users
+
+        json_data = json.dumps(data)
+            
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            response_data = json.loads(response.text)
+                
+            if response_data['success'] == 'True':
+                print('[SERVER]', response_data['message'])
+                return True
+            else:    
+                print('[SERVER]', response_data['message'])
+                return False
+
+        print('[CLEINT][core_task] Unban ip error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] Unban ip exception occured.\n', e)

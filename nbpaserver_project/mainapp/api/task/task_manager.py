@@ -85,6 +85,16 @@ def fetch_feedback(id=None, ip=None, feedback_type_name=None):
         
     return list(feedbacks)
 
+def fetch_banned_user(id=None, ip=None):
+    banned_users = None
+    if id:
+        banned_users = models.BannedUser.objects.filter(id=id)
+    elif ip:
+        banned_users = models.BannedUser.objects.filter(ip=ip)
+    else:
+        banned_users = models.BannedUser.objects.all()
+    return list(banned_users)
+
 def fetch_blog_info(target_url):
     '''
     DB에 BlogInfo가 있으면 반환, 없으면 크롤러로 파싱하여
