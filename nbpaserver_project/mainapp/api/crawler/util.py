@@ -1,9 +1,10 @@
-import os, csv
+import os, csv, re
 import requests
 
 from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
+from emoji import UNICODE_EMOJI
 
 # 'UTF-8'이 아닌, 'MS949'로 할 경우 엑셀에서 바로 열 수 있지만, 특정 문자(\u2027)가 포함된 경우 오류가 납니다.
 CSV_ENCODING_TYPE = 'utf-8'
@@ -102,3 +103,10 @@ def save_as_csv(file_name_header, blog_post_list):
         print(e)
 
     return
+
+def remove_emoji(text):
+    result = text
+    for char in text:
+        if char in UNICODE_EMOJI:
+            result = result.replace(char, '')
+    return result

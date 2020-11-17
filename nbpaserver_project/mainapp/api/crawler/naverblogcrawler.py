@@ -145,7 +145,11 @@ def parse_entire_body(content):
     # 공백 여러개를 하나로
     result = re.sub(r'( |\t|\xa0)+', ' ', result)
 
-    return result.strip()
+    # 이모지 처리
+    result = util.remove_emoji(result)
+    result = result.strip()
+    
+    return result
         
             
 # 하이퍼링크 목록을 반환
