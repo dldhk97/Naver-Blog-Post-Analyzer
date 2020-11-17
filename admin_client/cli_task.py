@@ -155,10 +155,12 @@ def get_feedback(user_input=True):
 def delete_feedback(feedbacks):
     if len(feedbacks) <= 0:
         print('피드백 목록이 비어있습니다.')
-        return
-    user_input = input('조회된 모든 피드백을 삭제하시겠습니까?(Y/N)')
-    if (user_input == 'y') or (user_input == 'Y'):
-        core_task.delete_feedback(feedbacks)
+    else: 
+        user_input = input('조회된 모든 피드백을 삭제하시겠습니까?(Y/N)')
+        if (user_input == 'y') or (user_input == 'Y'):
+            core_task.delete_feedback(feedbacks)
+            return True
+    return False
         
 def save_feedback_as_csv(feedbacks):
     user_input = input('조회된 모든 피드백을 CSV로 저장하시겠습니까?(Y/N)')
@@ -172,6 +174,7 @@ def manage_feedback():
     feedbacks = get_feedback(user_input=True)
     if not feedbacks:
         print('조회된 피드백이 없습니다.')
+        return
 
     while True:
         i = 1
@@ -185,8 +188,9 @@ def manage_feedback():
         
         user_input = input('선택 : ')
         if user_input == '1':
-            delete_feedback(feedbacks)
-            feedbacks = []
+            deleted = delete_feedback(feedbacks)
+            if deleted:
+                return
         elif user_input == '2':
             save_feedback_as_csv(feedbacks)
         elif user_input == 'q':
@@ -219,10 +223,12 @@ def ban_user():
 def unban_user(banned_users):
     if len(banned_users) <= 0:
         print('밴 사용자 목록이 비어있습니다.')
-        return
-    user_input = input('조회된 모든 사용자들을 삭제하시겠습니까?(Y/N)')
-    if (user_input == 'y') or (user_input == 'Y'):
-        core_task.unban_user(banned_users)
+    else:
+        user_input = input('조회된 모든 사용자들을 삭제하시겠습니까?(Y/N)')
+        if (user_input == 'y') or (user_input == 'Y'):
+            core_task.unban_user(banned_users)
+            return True
+    return False
 
 def manage_ban():
     banned_users = get_banned_user(user_input=True)
@@ -236,14 +242,16 @@ def manage_ban():
             i += 1
 
         print('1) 새로 Ban IP')
-        print('2) 조회된 목록 Unban IP')
+        print('2) 조회된 IP Unban')
         print('q) 나가기')
         
         user_input = input('선택 : ')
         if user_input == '1':
             ban_user()
         elif user_input == '2':
-            unban_user(banned_users)
+            unbanned = unban_user(banned_users)
+            if unbanned:
+                return
         elif user_input == 'q':
             return
         

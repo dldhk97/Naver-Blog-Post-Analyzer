@@ -240,6 +240,7 @@ def get_feedback(json_data):
         else : 
             response_data['success'] = 'True'
             response_data['message'] = '피드백 정보가 없습니다.'
+            response_data['feedbacks'] = serializers.serialize('json', [])
         
     except Exception as e:
         print('[SYSTEM][core_task][get_feedback]', e)

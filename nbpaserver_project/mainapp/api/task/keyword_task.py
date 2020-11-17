@@ -9,6 +9,10 @@ def keyword_task(task):
     keyword_list = []
     try:
         keywords = analyze_keywords(task._dict['body'], top_k=20)
+        if not keywords:
+            print('키워드 분석을 하였으나, 문서 길이가 너무 짧거나 분석할 수 없는 문서(' + task._blog_id + ', ' + task._log_no + ')')
+            keywords = [['분석불가/ERR', ]]
+        
         print('keyword_task analyzed done : ', str(len(keywords)))
         
         for k in keywords:
@@ -17,7 +21,7 @@ def keyword_task(task):
             print(keyword)
         
     except Exception as e:
-        print(e)
+        print('[keyword_task]', e)
 
     return [task, keyword_list]
     

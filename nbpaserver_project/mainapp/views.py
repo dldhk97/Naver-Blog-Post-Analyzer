@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from .models import BlogInfo
-from .api import core_task, feedback_task, mlmodel_task, ban_task, test_task, auth_task
+from .api import core_task, mlmodel_task, test_task, auth_task
 
 # 분석 정보 요청 시
 # 클라이언트로부터 url 목록을 받아와 BlogInfo, AnalyzedInfo, MultimediaRatio, Dictionary 등을 반환함.

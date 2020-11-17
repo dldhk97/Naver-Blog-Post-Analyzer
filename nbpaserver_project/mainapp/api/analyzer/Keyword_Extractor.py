@@ -14,19 +14,25 @@ def komoran_tokenize(sent):
     return words
 
 # 분석할 글, top-k개 만큼 키워드 추출하여 단어/형태 (중요도) 리스트 반환
-def analyze_keywords(sents, top_k=50):
-    
+def analyze_keywords(sents, top_k=20):
+
+    # 전처리로 단어 형태 태깅
     preprocessed_sents = preprocess(sents)
 
-    sents_arr = []
-    for sent in preprocessed_sents.split('\n'):
-        sents_arr.append(sent.strip())
+    try:
 
-    keyword_extractor = KeywordSummarizer(
-        tokenize = komoran_tokenize,
-        window = -1,
-        verbose = False
-    )
-    
-    keywords = keyword_extractor.summarize(sents_arr, topk=top_k)
-    return keywords
+        sents_arr = []
+        for sent in preprocessed_sents.split('\n'):
+            sents_arr.append(sent.strip())
+
+        keyword_extractor = KeywordSummarizer(
+            tokenize = komoran_tokenize,
+            window = -1,
+            verbose = False,
+        )
+        
+        keywords = keyword_extractor.summarize(sents_arr, topk=top_k)
+        return keywords
+    except Exception as e:
+        print('[Keyword_extractor][analyze_keywords]', e)
+    return None
