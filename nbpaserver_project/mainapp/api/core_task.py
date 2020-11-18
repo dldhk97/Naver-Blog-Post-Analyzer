@@ -28,13 +28,18 @@ def get_entire_info_from_urls(json_array):
     # 받아온 url 목록을 순차 탐색
     for json_obj in json_array:
         try:
-            target_url = json_obj['url']
+            org_url = json_obj['url']
 
             # 블로그 게시글이 아니면 패스
-            if 'blog.naver.com' not in target_url:
+            if 'blog.naver.com' not in org_url:
                 continue
 
-            target_url = url_normalization(target_url)
+            target_url = url_normalization(org_url)
+
+            # URL 정규화에 실패한 경우
+            if not target_url:
+                print(org_url + ' 은 제한된 블로그이거나, 비공개 게시글이입니다.')
+                continue
             
             blog_info, tag_list, hyperlink_list = fetch_blog_info(target_url)
 

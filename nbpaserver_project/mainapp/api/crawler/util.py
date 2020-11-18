@@ -30,6 +30,8 @@ def url_normalization(url):
         for link in get_blog_post_content_soup.select('iframe#mainFrame'):
             normalizated_url = "http://blog.naver.com" + link.get('src')
             return normalizated_url
+        
+        return None
 
 
 # PostView URL에서 blog_id, log_no 추출
