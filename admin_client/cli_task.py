@@ -248,11 +248,10 @@ def manage_ban():
         user_input = input('선택 : ')
         if user_input == '1':
             ban_user()
+            return
         elif user_input == '2':
             unbanned = unban_user(banned_users)
             if unbanned:
                 return
         elif user_input == 'q':
             return
-        
-        banned_users = get_banned_user(user_input=False)

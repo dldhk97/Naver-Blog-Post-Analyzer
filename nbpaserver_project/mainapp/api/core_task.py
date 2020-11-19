@@ -103,6 +103,8 @@ def get_entire_info_from_urls(json_array):
     if len(json_data_list) > 1:
         header['success'] = 'True'
         header['message'] = '게시물 분석 정보 로드하였음.'
+    else:
+        header['message'] = '게시물 분석 결과가 존재하지 않습니다. 올바른 URL을 제공해주세요.'
 
     return json_data_list
 
@@ -409,10 +411,12 @@ def is_banend_ip(request):
     if ip:
         banned_users = fetch_banned_user(ip=ip)
         if len(banned_users) <= 0:
-            return False
+            return False, None
         else:
             print('[SYSTEM][core_task][check_banned_ip] ' + ip + ' is banned ip.')
+            reason = banned_users[0].reason
     else:
         print('[SYSTEM][core_task][check_banned_ip] Failed to get client IP.')
+        reason = '조회할 수 없는 IP'
     
-    return True
+    return True, reason

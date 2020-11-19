@@ -13,8 +13,15 @@ from .api import core_task, mlmodel_task, test_task, auth_task
 # 클라이언트로부터 url 목록을 받아와 BlogInfo, AnalyzedInfo, MultimediaRatio, Dictionary 등을 반환함.
 
 def check_banned_ip(request):
-    if core_task.is_banend_ip(request):
-        response = [{'success':'False', 'message':'밴 IP이기 때문에 처리하지 않습니다.', 'banned':'True'}, ]
+    is_banned, reason = core_task.is_banend_ip(request)
+    if is_banned:
+        response = []
+        header = {}
+        header['success'] = 'False'
+        header['message'] = '밴 IP이기 때문에 요청이 거부되었습니다.\n사유 : ' + reason
+        header['banned'] = 'True'
+        response.append(header)
+        
         return response
     return None
 

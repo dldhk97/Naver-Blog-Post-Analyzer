@@ -60,15 +60,8 @@ def lorem_analyze(sents):
             json_data = json.loads(response.text)
             if json_data['success'] == 'True':
                 print('')
-                print('확률 : ')
-                print(json_data['distances'])
                 print('토큰 : ')
                 print(json_data['tokens'])
-                print('평균값 : ' + json_data['mean'])
-                # 분산 내보기
-                print('분산 : ' + json_data['variance'])
-                # 표준편차 구하기
-                print('표준편차 : ' + json_data['standard_deviation'])
                 print('로렘 확률 : ' + json_data['lorem_percentage'])
                 print('')
 
