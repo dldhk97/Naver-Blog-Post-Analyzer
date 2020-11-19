@@ -115,6 +115,10 @@ def fetch_blog_info(target_url):
         task = Task(TaskType.BLOG_INFO, blog_id, log_no, target_url)
         result = bloginfo_task(task)
         blog_post = result[1]
+
+        if not blog_post:
+            print('[SYSTEM][core_task] BlogInfo(' + target_url + ') seems not exists!')
+            return None, None, None
         
         blog_info, hyperlink_list, tag_list = model_converter.blog_post_to_django_model(blog_post)
 

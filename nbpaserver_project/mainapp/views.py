@@ -15,6 +15,12 @@ from .api import core_task, mlmodel_task, test_task, auth_task
 def get_analyzed_info(request):
     if request.method == 'POST':
 
+        # if core_task.is_banend_ip(request):
+        #     response = []
+        #     header = {'success':'False', 'message':'밴 IP이기 때문에 처리하지 않습니다.', 'banned':'True'}
+        #     response.append(header)
+        #     return JsonResponse(response)
+
         json_array = json.loads(request.body)
 
         result = core_task.get_entire_info_from_urls(json_array)

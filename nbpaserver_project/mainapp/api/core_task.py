@@ -7,7 +7,7 @@ from django.core import serializers
 from .. import models
 from .crawler.util import url_normalization
 from .crawler import naverblogcrawler
-from .util import model_converter
+from .util import model_converter, request_util
 from .task.task import Task, TaskType
 from .task.task_manager import *
 from .task.bloginfo_task import bloginfo_task
@@ -360,3 +360,20 @@ def unban_user(json_data):
         print('[SYSTEM][core_task][unban_user]', e)
 
     return response_data
+
+def is_banend_ip(request):
+    '''
+    밴 당했으면 True, 아니면 False 반환
+    '''
+    ip = request_util.get_client_ip(request)
+    
+    if ip:
+        banned_users = fetch_banned_user(ip=ip)
+        if len(banned_users) <= 0:
+            return False
+        else:
+            print('[SYSTEM][core_task][check_banned_ip] ' + ip + ' is banned ip.')
+    else:
+        print('[SYSTEM][core_task][check_banned_ip] Failed to get client IP.')
+    
+    return True
