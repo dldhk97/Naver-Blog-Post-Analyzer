@@ -11,15 +11,20 @@ from .api import core_task, mlmodel_task, test_task, auth_task
 
 # 분석 정보 요청 시
 # 클라이언트로부터 url 목록을 받아와 BlogInfo, AnalyzedInfo, MultimediaRatio, Dictionary 등을 반환함.
+
+def check_banned_ip(request):
+    if core_task.is_banend_ip(request):
+        response = [{'success':'False', 'message':'밴 IP이기 때문에 처리하지 않습니다.', 'banned':'True'}, ]
+        return response
+    return None
+
 @method_decorator(csrf_exempt, name='dispatch')
 def get_analyzed_info(request):
     if request.method == 'POST':
 
-        # if core_task.is_banend_ip(request):
-        #     response = []
-        #     header = {'success':'False', 'message':'밴 IP이기 때문에 처리하지 않습니다.', 'banned':'True'}
-        #     response.append(header)
-        #     return JsonResponse(response)
+        res = check_banned_ip(request)
+        if res:
+            return JsonResponse(res, safe=False)
 
         json_array = json.loads(request.body)
 
@@ -34,6 +39,10 @@ def get_analyzed_info(request):
 @method_decorator(csrf_exempt, name='dispatch')
 def get_keyword(request):
     if request.method == 'POST':
+        
+        res = check_banned_ip(request)
+        if res:
+            return JsonResponse(res, safe=False)
     
         json_array = json.loads(request.body)
 
@@ -48,6 +57,10 @@ def get_keyword(request):
 @method_decorator(csrf_exempt, name='dispatch')
 def get_bloginfo(request):
     if request.method == 'POST':
+
+        res = check_banned_ip(request)
+        if res:
+            return JsonResponse(res, safe=False)
     
         json_array = json.loads(request.body)
 
@@ -62,6 +75,10 @@ def get_bloginfo(request):
 @method_decorator(csrf_exempt, name='dispatch')
 def send_feedback(request):
     if request.method == 'POST':
+
+        res = check_banned_ip(request)
+        if res:
+            return JsonResponse(res, safe=False)
         
         json_data = json.loads(request.body)
 

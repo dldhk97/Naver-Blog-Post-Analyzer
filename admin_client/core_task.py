@@ -112,6 +112,8 @@ def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hy
 
     pass
 
+#################################################################################
+
 def get_analyzed_info(data_list):
     '''
     URL 목록 딕셔너리를 입력받으면 서버로 보내고 결과 출력
@@ -124,15 +126,17 @@ def get_analyzed_info(data_list):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            blog_entire_info_arr = json.loads(response.text)
+            json_arr = json.loads(response.text)
 
-            header_data = blog_entire_info_arr[0]
+            header = json_arr[0]
+            data_arr = json_arr[1:]
                 
-            if header_data['success'] == 'True':
-                for info in blog_entire_info_arr[1:]:
+            if header['success'] == 'True':
+                for info in data_arr:
                     analyzed_info = None
                     multimedia_ratios = None
                     keywords = None
+
                     blog_info = json.loads(info['blog_info'])[0]
                     if 'analyzed_info' in info:
                         analyzed_info = json.loads(info['analyzed_info'])[0]
@@ -149,7 +153,7 @@ def get_analyzed_info(data_list):
                     
                 return True
             else:    
-                print('[SERVER]', header_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] get_analyzed_info error occured! Status_code is not 200 or 201!')
@@ -169,19 +173,27 @@ def get_keyword(url):
         
         response = requests.post(request_url, data=json_data)
 
+        # 통신이 성공하였는가?
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
-                
-            if response_data['success'] == 'True':
-                keywords = json.loads(response_data['keywords'])
-                
-                for keyword in keywords:
-                    k = keyword['fields']
-                    print(k)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
+            data_arr = json_arr[1:]
+            
+            # 키워드 얻는데 성공하였는가?
+            if header['success'] == 'True':
+
+                # 여러 게시글에 대해 키워드 Json 배열이 들어왔으므로(한 URL만 보내지만, 헤더+데이터배열로 응답함)
+                for data_json in data_arr:
+                    # 한 게시글에 대한 키워드목록 추출
+                    keywords = json.loads(data_json['keywords'])
+                    for keyword in keywords:
+                        k = keyword['fields']
+                        print(k)
 
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] get_keywords error occured! Status_code is not 200 or 201!')
@@ -202,15 +214,19 @@ def get_bloginfo(url):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
+            data_arr = json_arr[1:]
                 
-            if response_data['success'] == 'True':
-                blog_info = json.loads(response_data['blog_info'])
-                blog_info = blog_info[0]['fields']
-                print(blog_info)
+            if header['success'] == 'True':
+                for data in data_arr:
+                    blog_infos = json.loads(data['blog_info'])
+                    blog_info = blog_infos[0]
+                    print(blog_info)
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] get_bloginfo error occured! Status_code is not 200 or 201!')
@@ -236,19 +252,24 @@ def send_feedback(url, ip, feedback_type, message):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
                 
-            if response_data['success'] == 'True':
-                msg = response_data['message']
+            if header['success'] == 'True':
+                msg = header['message']
                 print('[SERVER', msg)
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] send_feedback error occured! Status_code is not 200 or 201!')
     except Exception as e:
         print('[CLEINT][core_task] send_feedback exception occured.\n', e)
+
+
+###########################################################################
 
 def get_feedback(id=None, ip=None, feedback_type_name=None):
     '''

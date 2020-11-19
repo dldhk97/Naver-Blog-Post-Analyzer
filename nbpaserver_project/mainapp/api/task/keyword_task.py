@@ -19,8 +19,8 @@ def keyword_task(task):
         
         for k in keywords:
             # 의존명사인 경우 제외함.
-            if k[0].split('/')[1] not in EXCEPT_TAG:
-                keyword = k[0]          # 단어/형태 모양으로 들어감
+            keyword = k[0]
+            if keyword.split('/')[1] not in EXCEPT_TAG:
                 keyword_list.append(keyword)
                 print(keyword, ' appended.')
             else:
