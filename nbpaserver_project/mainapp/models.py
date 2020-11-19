@@ -24,6 +24,10 @@ class AnalyzedInfo(models.Model):
     lorem_percentage = models.FloatField(default=-1)
     tag_similarity = models.FloatField(default=-1)
 
+    sample_1 = models.TextField()
+    sample_2 = models.TextField()
+    sample_3 = models.TextField()
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

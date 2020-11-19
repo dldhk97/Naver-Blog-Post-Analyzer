@@ -63,6 +63,9 @@ def lorem_analyze(sents):
                 print('토큰 : ')
                 print(json_data['tokens'])
                 print('로렘 확률 : ' + json_data['lorem_percentage'])
+                print('샘플_1 : ' + json_data['sample_1'])
+                print('샘플_2 : ' + json_data['sample_2'])
+                print('샘플_3 : ' + json_data['sample_3'])
                 print('')
 
                 return True

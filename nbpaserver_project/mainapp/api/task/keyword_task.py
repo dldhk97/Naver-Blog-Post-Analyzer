@@ -22,9 +22,10 @@ def keyword_task(task):
             keyword = k[0]
             if keyword.split('/')[1] not in EXCEPT_TAG:
                 keyword_list.append(keyword)
-                print(keyword, ' appended.')
+                # print(keyword, ' appended.')
             else:
-                print(keyword, ' excepted.')
+                # print(keyword, ' excepted.')
+                pass
 
         # 추출된 키워드가 없을 경우
         if len(keyword_list) <= 0:

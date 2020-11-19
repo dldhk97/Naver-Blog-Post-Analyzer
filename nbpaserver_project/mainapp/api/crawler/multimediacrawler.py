@@ -13,7 +13,7 @@ def prepare_selenium():
     global driver
     options = webdriver.ChromeOptions()
     # options.add_argument('--start-maximized') # 창의 크기를 최대로
-    # options.add_argument('headless')          # 윈도우 창이 표시되지 않는 헤드리스 모드
+    options.add_argument('headless')          # 윈도우 창이 표시되지 않는 헤드리스 모드
 
     driver_name = None
     if platform.system() == 'Linux':

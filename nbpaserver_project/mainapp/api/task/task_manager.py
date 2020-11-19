@@ -27,6 +27,11 @@ from ..crawler.util import url_normalization, get_post_identifier_from_url
 
 ################################
 
+RUNNING_TASK = []
+
+ANALYZE_PROCESS_POOL_SIZE = 2
+MULTIMEDIA_PROCESS_POOL_SIZE = 2
+
 def is_same_task(task1, task2):
     if task1._blog_id != task2._blog_id:
         return False
@@ -143,15 +148,12 @@ def fetch_blog_info(target_url):
 
 #######################
 
-RUNNING_TASK = []
-
 def save_model(task, result):
     # 멀티프로세싱이 끝나면, 각 정보들을 DB에 넣을 수 있게 모델 변환 후 저장
     if task._task_type == TaskType.BLOG_INFO:
         return
 
     try:
-        # blog_info_task = Task(TaskType.BLOG_INFO, task._blog_id, task._log_no, task._url)
         blog_info, hyperlink_list, tag_list = fetch_blog_info(task._url)
     except Exception as e:
         print('[process][save_model] Failed to bloginfo_task\n', e)
@@ -169,7 +171,7 @@ def save_model(task, result):
         elif task._task_type == TaskType.ANALYZE:
             if result != {}:
                 analyzed_info = result
-                converted_analyzed_info = model_converter.analyzed_info_to_django_model(blog_info, analyzed_info['lorem_percentage'], analyzed_info['tag_similarity'])
+                converted_analyzed_info = model_converter.analyzed_info_to_django_model(blog_info, analyzed_info['lorem_percentage'], analyzed_info['tag_similarity'], analyzed_info['sample_1'], analyzed_info['sample_2'], analyzed_info['sample_3'])
                 converted_analyzed_info.save()
                 analyzed_info = converted_analyzed_info
                 print('[SYSTEM][core_task] AnalyzedInfo(' + blog_info.blog_id +', ' + blog_info.log_no + ') saved in database!')
@@ -207,7 +209,8 @@ def task_callback(result_tuple):
 def runner(request_queue):
     print('runner run!')
 
-    pool = Pool(processes=4)
+    analyze_pool = Pool(processes=ANALYZE_PROCESS_POOL_SIZE)
+    process_pool = Pool(processes=MULTIMEDIA_PROCESS_POOL_SIZE)
 
     while True:
         try:
@@ -223,9 +226,13 @@ def runner(request_queue):
                     break
             
             if not same_task_exists:
-
                 callable_task = task_to_callable(requested_task)
-                pool.apply_async(callable_task, (requested_task, ), callback=task_callback)
+
+                if requested_task._task_type == TaskType.ANALYZE:
+                    analyze_pool.apply_async(callable_task, (requested_task, ), callback=task_callback)
+                else:
+                    process_pool.apply_async(callable_task, (requested_task, ), callback=task_callback)
+                
                 RUNNING_TASK.append(requested_task)
 
                 print('data found to be processed: {}'.format(requested_task))

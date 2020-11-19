@@ -45,11 +45,14 @@ def dictionary_to_django_model(blog_info, word, dictionary_type):
 
     return dictionary
 
-def analyzed_info_to_django_model(blog_info, lorem_percentage, tag_similarity):
+def analyzed_info_to_django_model(blog_info, lorem_percentage, tag_similarity, sample_1, sample_2, sample_3):
     analyzed_info = models.AnalyzedInfo()
     analyzed_info.blog_info = blog_info
     analyzed_info.lorem_percentage = lorem_percentage
     analyzed_info.tag_similarity = tag_similarity
+    analyzed_info.sample_1 = sample_1
+    analyzed_info.sample_2 = sample_2
+    analyzed_info.sample_3 = sample_3
 
     return analyzed_info
 

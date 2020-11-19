@@ -1,7 +1,7 @@
 from .analyzer import lorem_analyzer
 from .crawler import naverblogcrawler
 
-# 사용자에게 문장을 받아 로렘 분석함.
+# 관리자에게 문장을 받아 로렘 분석함.
 def lorem_analyze(json_data):
     response = {}
     response['task_type'] = 'lorem_analyze'
@@ -13,7 +13,7 @@ def lorem_analyze(json_data):
         sents = json_data['sents']
 
         # 로렘 분석하여 확률 구함
-        lorem_percentage = lorem_analyzer.get_lorem_percentage(sents)
+        lorem_percentage, samples = lorem_analyzer.get_lorem_percentage(sents)
 
         if lorem_percentage > -1:
             # 토큰화된 문장 배열 얻음.
@@ -24,6 +24,9 @@ def lorem_analyze(json_data):
             
             response['tokens'] = str(tokens)
             response['lorem_percentage'] = str(lorem_percentage)
+            response['sample_1'] = samples[0]
+            response['sample_2'] = samples[1] if len(samples) > 1 else ''
+            response['sample_3'] = samples[2] if len(samples) > 2 else ''
         else:
             response['message'] = '로렘 분석 실패. 오류가 발생했거나 문장이 너무 짧습니다.'
 
