@@ -21,7 +21,7 @@ def prepare_selenium():
         driver_name = 'chromedriver85_linux'
     else:
         print('Platform is Windows')
-        driver_name = 'chromedriver85_win.exe'
+        driver_name = 'chromedriver87_win.exe'
     
     driver_path = os.getcwd() + os.sep + 'nbpaserver_project' + os.sep + 'mainapp' + os.sep + 'api' + os.sep + 'crawler' + os.sep + 'bin' + os.sep + driver_name
 
