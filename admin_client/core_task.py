@@ -125,13 +125,16 @@ def get_analyzed_info(data_list):
         
         response = requests.post(request_url, data=json_data)
 
+        # 통신이 성공적인가?
         if response.status_code == 200 or response.status_code == 200:
             json_arr = json.loads(response.text)
 
             header = json_arr[0]
             data_arr = json_arr[1:]
                 
+            # 정보를 제대로 가져올 수 있었는가?
             if header['success'] == 'True':
+                # 여러 URL에 대해 하나씩 데이터 추출
                 for info in data_arr:
                     analyzed_info = None
                     multimedia_ratios = None
@@ -149,6 +152,7 @@ def get_analyzed_info(data_list):
                     if 'keywords' in info:
                         keywords = json.loads(info['keywords'])
                     
+                    # 출력
                     print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords)
                     
                 return True
@@ -173,7 +177,7 @@ def get_keyword(url):
         
         response = requests.post(request_url, data=json_data)
 
-        # 통신이 성공하였는가?
+        # 통신이 성공적인가?
         if response.status_code == 200 or response.status_code == 200:
             json_arr = json.loads(response.text)
 
@@ -182,14 +186,14 @@ def get_keyword(url):
             
             # 키워드 얻는데 성공하였는가?
             if header['success'] == 'True':
-
-                # 여러 게시글에 대해 키워드 Json 배열이 들어왔으므로(한 URL만 보내지만, 헤더+데이터배열로 응답함)
-                for data_json in data_arr:
-                    # 한 게시글에 대한 키워드목록 추출
-                    keywords = json.loads(data_json['keywords'])
-                    for keyword in keywords:
-                        k = keyword['fields']
-                        print(k)
+                # 한 게시글에 대한 키워드목록 추출
+                keywords_json = data_arr[0]['keywords']
+                
+                # 키워드목록 json을 딕셔너리로 변환
+                keywords = json.loads(keywords_json)
+                for keyword in keywords:
+                    k = keyword['fields']
+                    print(k)
 
                 return True
             else:    
@@ -213,17 +217,19 @@ def get_bloginfo(url):
         
         response = requests.post(request_url, data=json_data)
 
+        # 통신이 성공적인가?
         if response.status_code == 200 or response.status_code == 200:
             json_arr = json.loads(response.text)
 
             header = json_arr[0]
             data_arr = json_arr[1:]
                 
+            # 블로그 정보를 얻는데 성공하였는가?
             if header['success'] == 'True':
-                for data in data_arr:
-                    blog_infos = json.loads(data['blog_info'])
-                    blog_info = blog_infos[0]
-                    print(blog_info)
+                blog_infos_json = data_arr[0]['blog_info']
+                blog_infos = json.loads(blog_infos_json)
+                blog_info = blog_infos[0]
+                print(blog_info)
                 return True
             else:    
                 print('[SERVER]', header['message'])
@@ -292,13 +298,17 @@ def get_feedback(id=None, ip=None, feedback_type_name=None):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
+            data_arr = json_arr[1:]
                 
-            if response_data['success'] == 'True':
-                feedbacks = json.loads(response_data['feedbacks'])
+            if header['success'] == 'True':
+                feedbacks_json = data_arr[0]['feedbacks']
+                feedbacks = json.loads(feedbacks_json)
                 return feedbacks
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return None
 
         print('[CLEINT][core_task] get_feedback error occured! Status_code is not 200 or 201!')
@@ -323,13 +333,15 @@ def delete_feedback(feedbacks):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
                 
-            if response_data['success'] == 'True':
-                print('[SERVER]', response_data['message'])
+            if header['success'] == 'True':
+                print('[SERVER]', header['message'])
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] get_feedback error occured! Status_code is not 200 or 201!')
@@ -357,13 +369,17 @@ def get_banned_user(id=None, ip=None):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
+            data_arr = json_arr[1:]
                 
-            if response_data['success'] == 'True':
-                banned_users = json.loads(response_data['banned_users'])
+            if header['success'] == 'True':
+                banned_users_json = data_arr[0]['banned_users']
+                banned_users = json.loads(banned_users_json)
                 return banned_users
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return None
 
         print('[CLEINT][core_task] get_banned_ip error occured! Status_code is not 200 or 201!')
@@ -389,13 +405,15 @@ def ban_user(ip, reason):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
                 
-            if response_data['success'] == 'True':
-                print('[SERVER]', response_data['message'])
+            if header['success'] == 'True':
+                print('[SERVER]', header['message'])
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] ban ip error occured! Status_code is not 200 or 201!')
@@ -420,13 +438,15 @@ def unban_user(banned_users):
         response = requests.post(request_url, data=json_data)
 
         if response.status_code == 200 or response.status_code == 200:
-            response_data = json.loads(response.text)
+            json_arr = json.loads(response.text)
+
+            header = json_arr[0]
                 
-            if response_data['success'] == 'True':
-                print('[SERVER]', response_data['message'])
+            if header['success'] == 'True':
+                print('[SERVER]', header['message'])
                 return True
             else:    
-                print('[SERVER]', response_data['message'])
+                print('[SERVER]', header['message'])
                 return False
 
         print('[CLEINT][core_task] Unban ip error occured! Status_code is not 200 or 201!')

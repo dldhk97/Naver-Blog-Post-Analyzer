@@ -143,6 +143,7 @@ def get_keyword(json_data):
             keywords_data = {}
             keywords_data['keywords'] = serializers.serialize('json', keyword_list)
             json_data_list.append(keywords_data)
+
             header['success'] = 'True'
             header['message'] = '키워드 정보 로드하였음.'
         else : 
@@ -231,10 +232,15 @@ def send_feedback(json_data):
 
     return json_data_list
 
+##########################################################################
+
 def get_feedback(json_data):
-    response_data = {}
-    response_data['success'] = 'False'
-    response_data['message'] = '피드백 정보를 불러오는 중 알 수 없는 오류 발생!'
+    json_data_list = []
+
+    header = {}
+    header['success'] = 'False'
+
+    json_data_list.append(header)
 
     try:
         id = None
@@ -252,30 +258,35 @@ def get_feedback(json_data):
         
         feedback_list = fetch_feedback(id=id, ip=ip, feedback_type_name=feedback_type_name)
         
+        header['success'] = 'True'
+        feedback_data = {}
         if len(feedback_list) > 0:
-            response_data['feedbacks'] = serializers.serialize('json', feedback_list)
-            response_data['success'] = 'True'
-            response_data['message'] = '피드백 정보 로드하였음.'
+            feedback_data['feedbacks'] = serializers.serialize('json', feedback_list)
+            header['message'] = '피드백 정보 로드하였음.'
         else : 
-            response_data['success'] = 'True'
-            response_data['message'] = '피드백 정보가 없습니다.'
-            response_data['feedbacks'] = serializers.serialize('json', [])
+            feedback_data['feedbacks'] = serializers.serialize('json', [])
+            header['message'] = '피드백 정보가 없습니다.'
+        json_data_list.append(feedback_data)
         
     except Exception as e:
         print('[SYSTEM][core_task][get_feedback]', e)
+        header['message'] = '피드백 정보를 불러오는 중 알 수 없는 오류 발생!'
 
-    return response_data
+    return json_data_list
 
 def delete_feedback(json_data):
-    response_data = {}
-    response_data['success'] = 'False'
-    response_data['message'] = '피드백을 삭제하는 중 알 수 없는 오류 발생!'
+    json_data_list = []
+
+    header = {}
+    header['success'] = 'False'
+
+    json_data_list.append(header)
 
     try:
         feedbacks = None
         if not 'feedbacks' in json_data:
-            response_data['message'] = '삭제할 피드백 목록이 비어있습니다.'
-            return 
+            header['message'] = '삭제할 피드백 목록이 비어있습니다.'
+            return  json_data_list
 
         # 클라이언트에게서 삭제할 피드백 목록을 받음.
         feedbacks = json_data['feedbacks']
@@ -290,20 +301,24 @@ def delete_feedback(json_data):
             # 피드백 삭제
             for f in feedback_list:
                 f.delete()
-            response_data['success'] = 'True'
-            response_data['message'] = '피드백 정보 삭제하였음.'
+            header['success'] = 'True'
+            header['message'] = '피드백 정보 삭제하였음.'
         else : 
-            response_data['message'] = '삭제할 피드백 정보를 찾지 못했습니다.'
+            header['message'] = '삭제할 피드백 정보를 찾지 못했습니다.'
         
     except Exception as e:
         print('[SYSTEM][core_task][delete_feedback]', e)
+        header['message'] = '피드백을 삭제하는 중 알 수 없는 오류 발생!'
 
-    return response_data
+    return json_data_list
 
 def get_banned_user(json_data):
-    response_data = {}
-    response_data['success'] = 'False'
-    response_data['message'] = '밴 정보를 불러오는 중 알 수 없는 오류 발생!'
+    json_data_list = []
+
+    header = {}
+    header['success'] = 'False'
+
+    json_data_list.append(header)
 
     try:
         id = None
@@ -317,24 +332,29 @@ def get_banned_user(json_data):
         
         banned_users = fetch_banned_user(id=id, ip=ip)
         
+        header['success'] = 'True'
+        banned_users_data = {}
         if len(banned_users) > 0:
-            response_data['banned_users'] = serializers.serialize('json', banned_users)
-            response_data['success'] = 'True'
-            response_data['message'] = '밴 정보 로드하였음.'
+            banned_users_data['banned_users'] = serializers.serialize('json', banned_users)
+            header['message'] = '밴 정보 로드하였음.'
         else : 
-            response_data['success'] = 'True'
-            response_data['message'] = '밴 정보가 없습니다.'
-            response_data['banned_users'] = serializers.serialize('json', [])
+            banned_users_data['banned_users'] = serializers.serialize('json', [])
+            header['message'] = '밴 정보가 없습니다.'
+        json_data_list.append(banned_users_data)
         
     except Exception as e:
         print('[SYSTEM][core_task][get_banned_ip]', e)
+        header['message'] = '밴 정보를 불러오는 중 알 수 없는 오류 발생!'
 
-    return response_data
+    return json_data_list
 
 def ban_user(json_data):
-    response_data = {}
-    response_data['success'] = 'False'
-    response_data['message'] = '사용자를 Ban 하는 도중 알 수 없는 오류 발생!'
+    json_data_list = []
+
+    header = {}
+    header['success'] = 'False'
+
+    json_data_list.append(header)
 
     try:
         # Banned_user 생성
@@ -343,18 +363,22 @@ def ban_user(json_data):
         banned_user.reason = json_data['reason']
 
         banned_user.save()
-        response_data['success'] = 'True'
-        response_data['message'] = '해당 사용자를 Ban DB에 저장하는데 성공했습니다!'
+        header['success'] = 'True'
+        header['message'] = '해당 사용자를 Ban DB에 저장하는데 성공했습니다!'
         
     except Exception as e:
         print('[SYSTEM][core_task][ban_user]', e)
+        header['message'] = '사용자를 Ban 하는 도중 알 수 없는 오류 발생!'
 
-    return response_data
+    return json_data_list
 
 def unban_user(json_data):
-    response_data = {}
-    response_data['success'] = 'False'
-    response_data['message'] = '사용자들을 Unban 하는 도중 알 수 없는 오류 발생!'
+    json_data_list = []
+
+    header = {}
+    header['success'] = 'False'
+
+    json_data_list.append(header)
 
     try:
         banned_users = json_data['banned_users']
@@ -367,13 +391,14 @@ def unban_user(json_data):
         for bu in unban_list:
             bu.delete()
 
-        response_data['success'] = 'True'
-        response_data['message'] = '해당되는 사용자들을 Unban하였습니다!'
+        header['success'] = 'True'
+        header['message'] = '해당되는 사용자들을 Unban하였습니다!'
         
     except Exception as e:
         print('[SYSTEM][core_task][unban_user]', e)
+        header['message'] = '사용자들을 Unban 하는 도중 알 수 없는 오류 발생!'
 
-    return response_data
+    return json_data_list
 
 def is_banend_ip(request):
     '''
