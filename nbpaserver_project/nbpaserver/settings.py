@@ -29,7 +29,7 @@ SECRET_KEY = 'u=b_m&%xt1adxugz2wa446y0q-selrg$k%uenhx48oj6hjp#2e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['nbpa.ddns.net']
 
 
 # Application definition

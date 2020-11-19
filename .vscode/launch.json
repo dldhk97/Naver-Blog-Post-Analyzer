@@ -5,14 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Django Server(port:8080)",
+            "name": "Python: Django Server(port:33067)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/nbpaserver_project/manage.py",
             "console": "integratedTerminal",
             "args": [
                 "runserver", 
-                "8080",             // 포트
+                "0.0.0.0:33067",    // 포트(원격 접속 허용)
+                "--noreload",       // startup code가 두번 실행되지 않게 함.
+            ],
+            "django": true
+        },
+        {
+            "name": "Python: Local Django Server(port:8080)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/nbpaserver_project/manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "runserver", 
+                "8080",             // 포트(로컬만 허용)
                 "--noreload",       // startup code가 두번 실행되지 않게 함.
             ],
             "django": true
