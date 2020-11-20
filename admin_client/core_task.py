@@ -63,9 +63,20 @@ def lorem_analyze(sents):
                 print('토큰 : ')
                 print(json_data['tokens'])
                 print('로렘 확률 : ' + json_data['lorem_percentage'])
-                print('샘플_1 : ' + json_data['sample_1'])
-                print('샘플_2 : ' + json_data['sample_2'])
-                print('샘플_3 : ' + json_data['sample_3'])
+
+                for i in range(3):
+                    current = 'sample_' + str(i)
+                    if json_data.get(current):
+                        print(current + ' : ' + json_data[current])
+                        tokens = json_data[current + '_tokens']
+                        probs = json_data[current + '_probs']
+                        print(current + ' 토큰 및 확률 : ')
+                        for j in range(len(tokens)):
+                            special_tag = ''
+                            if probs[j] > 0.025:
+                                special_tag = '\t(!)'
+                            print(str(tokens[j]) + ', ' + str(probs[j]) + special_tag)
+                        print(' ')
                 print('')
 
                 return True
@@ -470,8 +481,14 @@ def analyze_post_body(url):
                     current = 'sample_' + str(i)
                     if json_data.get(current):
                         print(current + ' : ' + json_data[current])
-                        print(current + ' 토큰 : ' + json_data[current + '_tokens'])
-                        print(current + ' 확률 : ' + json_data[current + '_probs'])
+                        tokens = json_data[current + '_tokens']
+                        probs = json_data[current + '_probs']
+                        print(current + ' 토큰 및 확률 : ')
+                        for j in range(len(tokens)):
+                            special_tag = ''
+                            if probs[j] > 0.025:
+                                special_tag = '\t(!)'
+                            print(str(tokens[j]) + ', ' + str(probs[j]) + special_tag)
                         print(' ')
                 print('')
 

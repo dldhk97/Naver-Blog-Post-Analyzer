@@ -26,9 +26,17 @@ def lorem_analyze(json_data):
             
             response['tokens'] = str(tokens)
             response['lorem_percentage'] = str(lorem_percentage)
-            response['sample_1'] = samples[0]
-            response['sample_2'] = samples[1] if len(samples) > 1 else ''
-            response['sample_3'] = samples[2] if len(samples) > 2 else ''
+            
+            # 각 샘플에 대해서 토큰, 확률배열도 가져옴
+            i = 1
+            for s in samples:
+                sample_org = s.split(')')[1].strip()
+                token_arr, prob_arr = lorem_analyzer.get_probablities(sample_org)
+                current = 'sample_' + str(i) 
+                response[current] = samples[i - 1]
+                response[current + '_tokens'] = token_arr
+                response[current + '_probs'] = prob_arr
+                i += 1
         else:
             response['message'] = '로렘 분석 실패. 오류가 발생했거나 문장이 너무 짧습니다.'
 
@@ -69,11 +77,12 @@ def analyze_post_body(json_data):
             # 각 샘플에 대해서 토큰, 확률배열도 가져옴
             i = 1
             for s in samples:
-                token_arr, prob_arr = lorem_analyzer.get_probablities(s)
+                sample_org = s.split(')')[1].strip()
+                token_arr, prob_arr = lorem_analyzer.get_probablities(sample_org)
                 current = 'sample_' + str(i) 
                 response[current] = samples[i - 1]
-                response[current + '_tokens'] = str(token_arr)
-                response[current + '_probs'] = str(prob_arr)
+                response[current + '_tokens'] = token_arr
+                response[current + '_probs'] = prob_arr
                 i += 1
         else:
             response['message'] = '게시글 분석에 실패하였습니다. 본문이 없는 게시글이거나 본문이 너무 짧습니다!'
