@@ -220,6 +220,18 @@ def lorem_analyze(request):
     pass
 
 @method_decorator(csrf_exempt, name='dispatch')
+def analyze_post_body(request):
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+
+        analyzed_data = test_task.analyze_post_body(json_data)
+
+        return JsonResponse(analyzed_data)
+    
+    print('[SYSTEM]Do not handle get request.')
+    pass
+
+@method_decorator(csrf_exempt, name='dispatch')
 def crawl_by_search_word(request):
     if request.method == 'POST':
         json_data = json.loads(request.body)

@@ -16,6 +16,7 @@ ADMIN_FUNCS = [
 TEST_FUNCS = [
     [cli_task.load_module, '모듈 로드'],
     [cli_task.lorem_analyze, '로렘 분석'],
+    [cli_task.analyze_post_body, '블로그 본문 분석']
 ]
 
 MENU_DICTS = [

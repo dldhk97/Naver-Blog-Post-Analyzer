@@ -21,5 +21,5 @@ urlpatterns = [
 
     url('admin/test/authorization', views.authorization, name='admin/test/authorization'),
     url('admin/test/lorem_analyze', views.lorem_analyze, name='admin/test/lorem_analyze'),
-    url('admin/test/getanalyzedinfo', views.get_analyzed_info, name='admin/test/getanalyzedinfo'),
+    url('admin/test/analyze_post_body', views.analyze_post_body, name='admin/test/analyze_post_body'),
 ]

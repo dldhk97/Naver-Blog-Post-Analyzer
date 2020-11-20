@@ -448,3 +448,38 @@ def unban_user(banned_users):
         print('[CLEINT][core_task] Unban ip error occured! Status_code is not 200 or 201!')
     except Exception as e:
         print('[CLEINT][core_task] Unban ip exception occured.\n', e)
+
+def analyze_post_body(url):
+    request_url = HOST_URL_HEAD + 'admin/test/analyze_post_body'
+    
+    try:
+        data = {}
+        data['url'] = url
+        
+        json_data = json.dumps(data)
+        
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            json_data = json.loads(response.text)
+            if json_data['success'] == 'True':
+                print('')
+                print('로렘 확률 : ' + json_data['lorem_percentage'])
+
+                for i in range(3):
+                    current = 'sample_' + str(i)
+                    if json_data.get(current):
+                        print(current + ' : ' + json_data[current])
+                        print(current + ' 토큰 : ' + json_data[current + '_tokens'])
+                        print(current + ' 확률 : ' + json_data[current + '_probs'])
+                        print(' ')
+                print('')
+
+                return True
+            else:    
+                print('[SERVER]', json_data['message'])
+                return False
+
+        print('[CLEINT][core_task] Lorem_analyze error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)

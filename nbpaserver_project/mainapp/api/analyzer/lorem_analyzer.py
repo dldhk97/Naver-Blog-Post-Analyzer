@@ -168,7 +168,7 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
     # 개행으로 최소 문자수보다 많은 줄만 추출하고, 특수문자 제거
     available_lines = []
     for s in sentence.split('\n'):
-        sent = remove_specials(s)
+        sent = remove_specials(s).strip()
         if check_min_sentence_length == False:
             available_lines.append(sent)
         elif len(sent) >= MIN_SENTNCE_LENGTH:
@@ -184,9 +184,10 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
     samples_with_lorem = []
     
     for s in samples:
-        if len(s) <= 0:
+        text = s.strip()
+        if len(text) <= 0:
             continue
-        result_tok_list, result_prob_list = get_probablities(s)
+        result_tok_list, result_prob_list = get_probablities(text)
         zero_convergence = []
         for i in range(len(result_tok_list)):
             tok = result_tok_list[i]

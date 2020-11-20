@@ -255,3 +255,8 @@ def manage_ban():
                 return
         elif user_input == 'q':
             return
+
+def analyze_post_body():
+    url = input('url : ')
+    if len(url) > 0:
+        core_task.analyze_post_body(url)
