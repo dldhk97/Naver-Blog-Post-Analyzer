@@ -3,7 +3,6 @@ import concurrent.futures
 from django.db.models import Q
 from django.core import serializers
 
-# from .task import core_job
 from .. import models
 from .crawler.util import url_normalization
 from .crawler import naverblogcrawler

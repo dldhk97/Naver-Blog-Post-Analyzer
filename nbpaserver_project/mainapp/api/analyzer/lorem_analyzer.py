@@ -93,7 +93,7 @@ def randomize_samples(lines, n):
 
 # 문장을 종결어미로 나눠서 반환
 kkma = Kkma()
-LONG_SENTNESE_CUTLINE = 200
+LONG_SENTNESE_CUTLINE = 100
 
 # 커트라인보다 긴 문장은 꼬꼬마로 자르고, 작으면 아무것도 하지않음.
 def sent_cutting(sent):
@@ -130,21 +130,26 @@ def head_tail_samples(lines):
         tail = splited_tail[0] if splited_tail else lines[1]
 
         if splited_head and len(splited_head) >= 2:
-            mid = head_tail_samples(splited_head)
-            return [head, mid, tail]
-        elif splited_tail and len(splited_tail) >= 2:
-            mid = head_tail_samples(splited_tail)
-            return [head, mid, tail]
-        else:
-            return [head, tail]
+            splited_mid = head_tail_samples(splited_head)
+            for mid in splited_mid:
+                if mid != head:
+                    return [head, mid, tail]
+        if splited_tail and len(splited_tail) >= 2:
+            splited_mid = head_tail_samples(splited_tail)
+            for mid in splited_mid:
+                if mid != tail:
+                    return [head, mid, tail]
+        
+        return [head, tail]
 
     else:
         splited = sent_cutting(lines[0])
 
-        if len(splited) >= 2:
-            return head_tail_samples(splited)
+        if splited:
+            if len(splited) >= 2:
+                return head_tail_samples(splited)
         
-        return [splited[0], ]
+        return [lines[0], ]
 
     
 
@@ -155,7 +160,7 @@ def remove_specials(sent):
 
 def get_lorem_percentage(sentence, check_min_sentence_length=True):
     if len(sentence.strip()) <= 0:
-        print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Empty sentence!')
+        print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Failed to analysis, Empty sentence!')
         return -1, None
 
     lorem_probs = []
@@ -170,7 +175,8 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
             available_lines.append(sent)
     # 추출된 줄이 전혀 없으면 에러 반환
     if len(available_lines) <= 0:
-        return -1
+        print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Failed to analysis, No avaliable sents!')
+        return -1, None
 
     # N개 샘플 추출
     # samples = randomize_samples(available_lines, SAMPLES_NUMBER)

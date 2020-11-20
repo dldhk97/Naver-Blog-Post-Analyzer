@@ -14,11 +14,16 @@ def analyze_task(task):
 
         result['lorem_percentage'] = lorem_percentage
         result['tag_similarity'] = tag_similarity
-        result['sample_1'] = samples[0]
-        result['sample_2'] = samples[1] if len(samples) > 1 else ''
-        result['sample_3'] = samples[2] if len(samples) > 2 else ''
+        if samples:
+            result['sample_1'] = samples[0]
+            result['sample_2'] = samples[1] if len(samples) > 1 else ''
+            result['sample_3'] = samples[2] if len(samples) > 2 else ''
+        else:
+            result['sample_1'] = ''
+            result['sample_2'] = ''
+            result['sample_3'] = ''
         
     except Exception as e:
-        print('[SYSTEM][core_job][analyze_job] URL (' + task._log_no +', ' + task._log_no + ') failed to analysis!')
+        print('[SYSTEM][analyze_task][analyze_job] ' + task._blog_id +', ' + task._log_no + ' failed to analysis! URL(' + task._url + ')\n', e)
 
     return [task, result]

@@ -207,14 +207,14 @@ def task_callback(result_tuple):
         print('Task (' + str(task) + ') removed from queue')
 
 def runner(request_queue):
-    print('runner run!')
+    print('runner running!')
 
     analyze_pool = Pool(processes=ANALYZE_PROCESS_POOL_SIZE)
     process_pool = Pool(processes=MULTIMEDIA_PROCESS_POOL_SIZE)
 
     while True:
         try:
-            print('runner wating!')
+            print('runner awating!')
             requested_task = request_queue.get()
             
             # Check if same task exists.
