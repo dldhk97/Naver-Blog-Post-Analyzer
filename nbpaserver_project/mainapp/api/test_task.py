@@ -13,7 +13,7 @@ def lorem_analyze(json_data):
         sents = json_data['sents']
 
         # 로렘 분석하여 확률 구함
-        lorem_percentage, samples = lorem_analyzer.get_lorem_percentage(sents)
+        lorem_percentage, samples = lorem_analyzer.get_lorem_percentage(sents, False)
 
         if lorem_percentage > -1:
             # 토큰화된 문장 배열 얻음.

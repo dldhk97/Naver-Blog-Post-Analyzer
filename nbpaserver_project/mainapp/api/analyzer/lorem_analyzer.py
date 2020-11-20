@@ -9,8 +9,8 @@ from konlpy.utils import pprint
 
 VOCAB_SIZE = 50000
 
-ZERO_CONVERGENCE_LIMIT = 0.05
-MIN_SENTNCE_LENGTH = 10
+ZERO_CONVERGENCE_LIMIT = 0.025
+MIN_SENTNCE_LENGTH = 20
 SAMPLES_NUMBER = 3
 
 model = None
@@ -93,57 +93,80 @@ def randomize_samples(lines, n):
 
 # 문장을 종결어미로 나눠서 반환
 kkma = Kkma()
-def split_kkma(sents):
-    text_s = kkma.sentences(sents)
-    return text_s
+LONG_SENTNESE_CUTLINE = 200
+
+# 커트라인보다 긴 문장은 꼬꼬마로 자르고, 작으면 아무것도 하지않음.
+def sent_cutting(sent):
+    if len(sent) > LONG_SENTNESE_CUTLINE:
+        spltited_sent = kkma.sentences(sent)
+
+        samples = []
+        for s in spltited_sent:
+            if len(s) >= MIN_SENTNCE_LENGTH:
+                samples.append(s)
+
+        if len(samples) > 0:
+            return samples
+    return None
 
 # n개로 나눠 첫문장, 중간문장, 마지막문장을 반환
 def head_tail_samples(lines):
     if len(lines) >= SAMPLES_NUMBER:
-        head = lines[0]
-        mid = lines[int(len(lines) / 2)]
-        tail = lines[len(lines) - 1]
+        splited_head = sent_cutting(lines[0])
+        splited_mid = sent_cutting(lines[int(len(lines) / 2)])
+        splited_tail = sent_cutting(lines[len(lines) - 1])
 
-        spltited_head = split_kkma(head)
-        spltited_mid = split_kkma(mid)
-        spltited_tail = split_kkma(tail)
-        
-        real_head = spltited_head[0]
-        real_mid = spltited_mid[0]
-        real_tail = spltited_tail[len(spltited_tail) - 1]
+        head = splited_head[0] if splited_head else lines[0]
+        mid = splited_mid[0] if splited_mid else lines[int(len(lines) / 2)]
+        tail = splited_tail[0] if splited_tail else lines[len(lines) - 1]
+        return [head, mid, tail]
 
-        return [real_head, real_mid, real_tail]
-    else:
+    elif len(lines) == 2:
         # 개행이 제대로 이루어지지 않아서, 혹은 그냥 짧은 문장이면
-        # 긴~ 문장인데 개행이 안된 경우 종결어미로 나눴을 때 여러 문장이 나오므로, 다시 head_tail_samples 사용.
-        splited_head = split_kkma(lines[0])
-        if len(splited_head) >= SAMPLES_NUMBER:
-            return head_tail_samples(splited_head)
+        splited_head = sent_cutting(lines[0])
+        splited_tail = sent_cutting(lines[1])
 
-        # 마지막 문장에 대해서 다시 head_tail_samples 실행
-        spltied_tail = split_kkma(lines[len(lines) - 1])
-        if len(spltied_tail) >= SAMPLES_NUMBER:
-            return head_tail_samples(spltied_tail)
+        head = splited_head[0] if splited_head else lines[0]
+        tail = splited_tail[0] if splited_tail else lines[1]
 
-        if splited_head[0] == spltied_tail[0]:
-            return [splited_head[0]]
+        if splited_head and len(splited_head) >= 2:
+            mid = head_tail_samples(splited_head)
+            return [head, mid, tail]
+        elif splited_tail and len(splited_tail) >= 2:
+            mid = head_tail_samples(splited_tail)
+            return [head, mid, tail]
+        else:
+            return [head, tail]
+
+    else:
+        splited = sent_cutting(lines[0])
+
+        if len(splited) >= 2:
+            return head_tail_samples(splited)
         
-        # 답없으면 그냥 첫녀석 마지막녀석 2놈만 반환
-        return [splited_head[0], spltied_tail[0]]
+        return [splited[0], ]
+
+    
 
 # !?.,를 제외한 특수문자 제거
 def remove_specials(sent):
     special_removed_sent = re.compile('[\{\}\[\]\/;:|\)*~`^\-_+<>@\#$%&\\\=\(\'\"]').sub('', sent)
     return special_removed_sent
 
-def get_lorem_percentage(sentence):
+def get_lorem_percentage(sentence, check_min_sentence_length=True):
+    if len(sentence.strip()) <= 0:
+        print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Empty sentence!')
+        return -1, None
+
     lorem_probs = []
 
     # 개행으로 최소 문자수보다 많은 줄만 추출하고, 특수문자 제거
     available_lines = []
     for s in sentence.split('\n'):
         sent = remove_specials(s)
-        if len(sent) >= MIN_SENTNCE_LENGTH:
+        if check_min_sentence_length == False:
+            available_lines.append(sent)
+        elif len(sent) >= MIN_SENTNCE_LENGTH:
             available_lines.append(sent)
     # 추출된 줄이 전혀 없으면 에러 반환
     if len(available_lines) <= 0:
@@ -152,6 +175,7 @@ def get_lorem_percentage(sentence):
     # N개 샘플 추출
     # samples = randomize_samples(available_lines, SAMPLES_NUMBER)
     samples = head_tail_samples(available_lines)
+    samples_with_lorem = []
     
     for s in samples:
         if len(s) <= 0:
@@ -172,10 +196,11 @@ def get_lorem_percentage(sentence):
         prob = lorem_prob if lorem_prob > 0.5 else 0.5
         prob = (prob - 0.5) * 2
         lorem_probs.append(prob)
+        samples_with_lorem.append('(' + str(round(prob, 3)) + ') ' + s)
 
     if lorem_probs:
         lorem_percentage = numpy.mean(lorem_probs)
-        return lorem_percentage, samples
+        return lorem_percentage, samples_with_lorem
 
     return -1, None
 

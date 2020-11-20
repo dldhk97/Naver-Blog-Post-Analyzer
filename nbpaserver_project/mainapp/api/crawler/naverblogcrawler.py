@@ -124,15 +124,24 @@ def parse_entire_body(content):
     # 이 경우 html 구조가 바뀌면 터질 위험이 높기에, 터지는 경우 get_text()로 그냥 통짜로 텍스트 긁어서 처리함.
 
     try:
-        result = ""
-        for elem in content:
+        result = ''
+        for elem in content.find_all(['div', 'p']):
             if 'Tag' in str(type(elem)):
                 result += elem.get_text() + '\n'
             elif 'String' in str(type(elem)):
                 result += str(elem) + '\n'
+
+        # for elem in content:
+        #     if 'Tag' in str(type(elem)):
+        #         result += elem.get_text() + '\n'
+        #     elif 'String' in str(type(elem)):
+        #         result += str(elem) + '\n'
     except Exception as e:
         result = str(content.get_text())
         print('[naverblogcralwer] Failed to manual html parse while parse_entire_body\n', e)
+
+    if result == '':
+        result = content.text
     
     # 이스케이프 문자 다 띄어쓰기로 변경
     result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF|\xa0)+', '\n', result)
