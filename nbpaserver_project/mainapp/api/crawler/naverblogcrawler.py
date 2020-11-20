@@ -125,17 +125,12 @@ def parse_entire_body(content):
 
     try:
         result = ''
-        for elem in content.find_all(['div', 'p']):
+        for elem in content.find_all(['div', 'p', 'span']):
             if 'Tag' in str(type(elem)):
-                result += elem.get_text() + '\n'
+                text = elem.get_text()
+                result += text + '\n'
             elif 'String' in str(type(elem)):
                 result += str(elem) + '\n'
-
-        # for elem in content:
-        #     if 'Tag' in str(type(elem)):
-        #         result += elem.get_text() + '\n'
-        #     elif 'String' in str(type(elem)):
-        #         result += str(elem) + '\n'
     except Exception as e:
         result = str(content.get_text())
         print('[naverblogcralwer] Failed to manual html parse while parse_entire_body\n', e)
@@ -144,7 +139,7 @@ def parse_entire_body(content):
         result = content.text
     
     # 이스케이프 문자 다 띄어쓰기로 변경
-    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF|\xa0)+', '\n', result)
+    result = re.sub(r'(\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF|\xa0)+', ' ', result)
 
     # 줄바꿈 문자 처리
     result = re.sub(r'\n+', '\n', result)
