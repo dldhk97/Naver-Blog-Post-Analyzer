@@ -31,11 +31,11 @@ def lorem_analyze(json_data):
             i = 1
             for s in samples:
                 sample_org = s.split(')')[1].strip()
-                token_arr, prob_arr = lorem_analyzer.get_probablities(sample_org)
+                tok_prob_list = lorem_analyzer.get_probablities(sample_org)
+                tok_prob_list = lorem_analyzer.repeating_sent_killer(tok_prob_list)
                 current = 'sample_' + str(i) 
                 response[current] = samples[i - 1]
-                response[current + '_tokens'] = token_arr
-                response[current + '_probs'] = prob_arr
+                response[current + '_tok_prob_list'] = tok_prob_list
                 i += 1
         else:
             response['message'] = '로렘 분석 실패. 오류가 발생했거나 문장이 너무 짧습니다.'
@@ -78,11 +78,10 @@ def analyze_post_body(json_data):
             i = 1
             for s in samples:
                 sample_org = s.split(')')[1].strip()
-                token_arr, prob_arr = lorem_analyzer.get_probablities(sample_org)
+                tok_prob_list = lorem_analyzer.get_probablities(sample_org)
                 current = 'sample_' + str(i) 
                 response[current] = samples[i - 1]
-                response[current + '_tokens'] = token_arr
-                response[current + '_probs'] = prob_arr
+                response[current + '_tok_prob_list'] = tok_prob_list
                 i += 1
         else:
             response['message'] = '게시글 분석에 실패하였습니다. 본문이 없는 게시글이거나 본문이 너무 짧습니다!'

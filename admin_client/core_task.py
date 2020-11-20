@@ -45,48 +45,6 @@ def load_module():
     except Exception as e:
         print('[CLEINT][core_task] Failed to load_module.\n', e)
 
-def lorem_analyze(sents):
-    request_url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
-    
-    try:
-        data = {}
-        data['sents'] = sents
-        
-        json_data = json.dumps(data)
-        
-        response = requests.post(request_url, data=json_data)
-
-        if response.status_code == 200 or response.status_code == 200:
-            json_data = json.loads(response.text)
-            if json_data['success'] == 'True':
-                print('')
-                print('토큰 : ')
-                print(json_data['tokens'])
-                print('로렘 확률 : ' + json_data['lorem_percentage'])
-
-                for i in range(3):
-                    current = 'sample_' + str(i)
-                    if json_data.get(current):
-                        print(current + ' : ' + json_data[current])
-                        tokens = json_data[current + '_tokens']
-                        probs = json_data[current + '_probs']
-                        print(current + ' 토큰 및 확률 : ')
-                        for j in range(len(tokens)):
-                            special_tag = ''
-                            if probs[j] > 0.025:
-                                special_tag = '\t(!)'
-                            print(str(tokens[j]) + ', ' + str(probs[j]) + special_tag)
-                        print(' ')
-                print('')
-
-                return True
-            else:    
-                print('[SERVER]', json_data['message'])
-                return False
-
-        print('[CLEINT][core_task] Lorem_analyze error occured! Status_code is not 200 or 201!')
-    except Exception as e:
-        print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
 
 def print_blog_entire_info(blog_info, analyzed_info, multimedia_ratios, tags, hyperlinks, keywords):
     if blog_info:
@@ -125,7 +83,7 @@ def get_analyzed_info(data_list):
     '''
     URL 목록 딕셔너리를 입력받으면 서버로 보내고 결과 출력
     '''
-    request_url = HOST_URL_HEAD + 'admin/test/getanalyzedinfo'
+    request_url = HOST_URL_HEAD + 'user/analyzedinfo/get'
     
     try:
         json_data = json.dumps(data_list)
@@ -460,6 +418,51 @@ def unban_user(banned_users):
     except Exception as e:
         print('[CLEINT][core_task] Unban ip exception occured.\n', e)
 
+def lorem_analyze(sents):
+    request_url = HOST_URL_HEAD + 'admin/test/lorem_analyze'
+    
+    try:
+        data = {}
+        data['sents'] = sents
+        
+        json_data = json.dumps(data)
+        
+        response = requests.post(request_url, data=json_data)
+
+        if response.status_code == 200 or response.status_code == 200:
+            json_data = json.loads(response.text)
+            if json_data['success'] == 'True':
+                print('')
+                print('토큰 : ')
+                print(json_data['tokens'])
+                print('로렘 확률 : ' + json_data['lorem_percentage'])
+
+                for i in range(3):
+                    current = 'sample_' + str(i)
+                    if json_data.get(current):
+                        print(current + ' : ' + json_data[current])
+                        tok_prob_list = json_data[current + '_tok_prob_list']
+                        print(current + ' 토큰 및 확률 : ')
+                        for j in range(len(tok_prob_list)):
+                            special_tag = ''
+                            tok = tok_prob_list[j][0]
+                            prob = tok_prob_list[j][1]
+                            
+                            if prob > 0.025:
+                                special_tag = '\t(!)'
+                            print(str(tok) + ', ' + str(prob) + special_tag)
+                        print(' ')
+                print('')
+
+                return True
+            else:    
+                print('[SERVER]', json_data['message'])
+                return False
+
+        print('[CLEINT][core_task] Lorem_analyze error occured! Status_code is not 200 or 201!')
+    except Exception as e:
+        print('[CLEINT][core_task] Lorem_analyze exception occured.\n', e)
+
 def analyze_post_body(url):
     request_url = HOST_URL_HEAD + 'admin/test/analyze_post_body'
     
@@ -481,14 +484,14 @@ def analyze_post_body(url):
                     current = 'sample_' + str(i)
                     if json_data.get(current):
                         print(current + ' : ' + json_data[current])
-                        tokens = json_data[current + '_tokens']
-                        probs = json_data[current + '_probs']
+                        tok_prob_list = json_data[current + '_tok_prob_list']
                         print(current + ' 토큰 및 확률 : ')
-                        for j in range(len(tokens)):
+                        for j in range(len(tok_prob_list)):
                             special_tag = ''
-                            if probs[j] > 0.025:
+                            prob = tok_prob_list[j][1]
+                            if prob > 0.025:
                                 special_tag = '\t(!)'
-                            print(str(tokens[j]) + ', ' + str(probs[j]) + special_tag)
+                            print(str(tokens[j]) + ', ' + str(prob) + special_tag)
                         print(' ')
                 print('')
 

@@ -13,6 +13,8 @@ ZERO_CONVERGENCE_LIMIT = 0.025
 MIN_SENTNCE_LENGTH = 20
 SAMPLES_NUMBER = 3
 
+REPEATING_TOKEN_KILL_LIMIT = 4
+
 model = None
 vocab = None
 tok = None
@@ -36,8 +38,7 @@ def get_probablities(sentence):
         load_module()
 
     cnt = 1
-    result_tok_list = []
-    result_prob_list = []
+    result_list = []
     splited = tok(sentence)
 
     # 토큰이 너무 많으면 자른다...
@@ -69,8 +70,7 @@ def get_probablities(sentence):
             if cur_tok_idx == vocab[word]:
                 # print(word + '(' + str(format(prob, "10.6%")).strip() + ')')
 
-                result_tok_list.append(word)
-                result_prob_list.append(prob)
+                result_list.append([word, prob])
                 
                 did_you_find = True
                 break
@@ -84,7 +84,7 @@ def get_probablities(sentence):
         toked = splited[:cnt] # 분석할 문장에 다음 단어를 추가한다. (단지 -> 단지 이번에는)
         # print(toked)
 
-    return result_tok_list, result_prob_list  # 거리가 저장된 배열 반환
+    return result_list
 
 # n개 랜덤 추출
 def randomize_samples(lines, n):
@@ -119,6 +119,7 @@ def head_tail_samples(lines):
         head = splited_head[0] if splited_head else lines[0]
         mid = splited_mid[0] if splited_mid else lines[int(len(lines) / 2)]
         tail = splited_tail[0] if splited_tail else lines[len(lines) - 1]
+
         return [head, mid, tail]
 
     elif len(lines) == 2:
@@ -151,12 +152,80 @@ def head_tail_samples(lines):
         
         return [lines[0], ]
 
-    
-
 # !?.,를 제외한 특수문자 제거
 def remove_specials(sent):
     special_removed_sent = re.compile('[\{\}\[\]\/;:|\)*~`^\-_+<>@\#$%&\\\=\(\'\"]').sub('', sent)
     return special_removed_sent
+
+# 연속적으로 제로 컨버전스 이상인 녀석들을 그룹화
+def group_sequential_over_convergence(tok_prob_list):
+    # 확률 배열을 돌면서
+    group_list = []
+    need_new_group = True
+    
+    for i in range(len(tok_prob_list)):
+        tok = tok_prob_list[i][0]
+        prob = tok_prob_list[i][1]
+
+        # 제로 컨버전스보다 크면 그룹에 넣는다.
+        if prob > ZERO_CONVERGENCE_LIMIT:
+            if need_new_group:
+                new_group = [[tok, prob]]
+                group_list.append(new_group)
+                need_new_group = False
+            else:
+                group_list[len(group_list) - 1].append([tok, prob])   
+        else:
+            # 제로 컨버전스보다 작으면 새 그룹을 만들어야 한다. 그룹이 끊겼으니까.
+            need_new_group = True
+            
+    return group_list
+
+# 반복되는 문장이 있으면 잡아서 확률을 떨어뜨린다.
+def repeating_sent_killer(tok_prob_list):
+    # 전체 토큰을 한줄로 만든다.
+    full_tok_sent = ''
+    for tup in tok_prob_list:
+        full_tok_sent += tup[0]
+
+    # 연속적으로 제로 컨버전스 이상이면, 무언가 이상함. 문장이 반복되고 있는지 확인해봐야함.
+    over_convergences = group_sequential_over_convergence(tok_prob_list)
+
+    kill_target_index = []
+    for group in over_convergences:
+        # 4 토큰 이상 연속인 녀석들만 본다.
+        if len(group) >= REPEATING_TOKEN_KILL_LIMIT:
+            # 그룹화된 토큰을 한줄로 만든다.
+            toks = ''
+            for tup in group:
+                toks += tup[0]
+
+            # 그룹화된 토큰이 전체 토큰 중 한번보다 많이 나오면(여러번 나왔다는 소리) 조정대상에 등록
+            cnt = full_tok_sent.count(toks)
+            if cnt > 1:
+                # 전체 토큰을 돌면서, 일치하는 녀석들은 다 확률을 낮춘다.
+                group_index = 0
+                for i in range(len(tok_prob_list)):
+                    tok = tok_prob_list[i][0]
+                    group_tok = group[group_index][0]
+                    
+                    if tok == group_tok:
+                        group_index += 1
+                        if group_index >= len(group):
+                            for j in range(group_index):
+                                kill_target_index.append(i - j)
+                            group_index = 0
+                    else:
+                        if group_index >= REPEATING_TOKEN_KILL_LIMIT:
+                            for j in range(group_index):
+                                kill_target_index.append(i - j)
+                        group_index = 0
+
+    # 조정 대상들의 확률을 조정
+    for index in kill_target_index:        
+        tok_prob_list[index][1] = ZERO_CONVERGENCE_LIMIT
+            
+    return tok_prob_list
 
 def get_lorem_percentage(sentence, check_min_sentence_length=True):
     if len(sentence.strip()) <= 0:
@@ -179,7 +248,6 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         return -1, None
 
     # N개 샘플 추출
-    # samples = randomize_samples(available_lines, SAMPLES_NUMBER)
     samples = head_tail_samples(available_lines)
     samples_with_lorem = []
     
@@ -187,15 +255,19 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         text = s.strip()
         if len(text) <= 0:
             continue
-        result_tok_list, result_prob_list = get_probablities(text)
+        tok_prob_list = get_probablities(text)
+
+        # 반복되는 문장을 잡는다.
+        tok_prob_list = repeating_sent_killer(tok_prob_list)
+
         zero_convergence = []
-        for i in range(len(result_tok_list)):
-            tok = result_tok_list[i]
-            prob = result_prob_list[i]
+        for i in range(len(tok_prob_list)):
+            tok = tok_prob_list[i][0]
+            prob = tok_prob_list[i][1]
             if prob <= ZERO_CONVERGENCE_LIMIT:
                 zero_convergence.append([tok, prob])
 
-        len_probs = len(result_prob_list)
+        len_probs = len(tok_prob_list)
         len_zero_convergence = len(zero_convergence)
         lorem_prob = len_zero_convergence / len_probs
 
