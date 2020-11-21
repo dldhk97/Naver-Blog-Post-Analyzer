@@ -408,6 +408,8 @@ def is_banend_ip(request):
     ip = request_util.get_client_ip(request)
     
     if ip:
+        print('[REQUEST] Request from ' + str(ip))
+
         banned_users = fetch_banned_user(ip=ip)
         if len(banned_users) <= 0:
             return False, None

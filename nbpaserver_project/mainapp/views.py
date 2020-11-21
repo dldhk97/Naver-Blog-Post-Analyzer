@@ -12,6 +12,8 @@ from .api import core_task, mlmodel_task, test_task, auth_task
 # 분석 정보 요청 시
 # 클라이언트로부터 url 목록을 받아와 BlogInfo, AnalyzedInfo, MultimediaRatio, Dictionary 등을 반환함.
 
+HTTP_METHOD_NAMES = ['POST', 'OPTIONS']
+
 def check_banned_ip(request):
     is_banned, reason = core_task.is_banend_ip(request)
     if is_banned:
@@ -27,7 +29,7 @@ def check_banned_ip(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def get_analyzed_info(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
 
         res = check_banned_ip(request)
         if res:
@@ -45,7 +47,7 @@ def get_analyzed_info(request):
 # 키워드 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
 def get_keyword(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         res = check_banned_ip(request)
         if res:
@@ -63,7 +65,7 @@ def get_keyword(request):
 # 블로그 정보(미리보기) 요청 시
 @method_decorator(csrf_exempt, name='dispatch')
 def get_bloginfo(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
 
         res = check_banned_ip(request)
         if res:
@@ -81,7 +83,7 @@ def get_bloginfo(request):
 # 피드백 생성시
 @method_decorator(csrf_exempt, name='dispatch')
 def send_feedback(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
 
         res = check_banned_ip(request)
         if res:
@@ -103,7 +105,7 @@ def send_feedback(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def get_feedbacks(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         json_data = json.loads(request.body)
 
@@ -116,7 +118,7 @@ def get_feedbacks(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def delete_feedback(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         json_data = json.loads(request.body)
 
@@ -132,7 +134,7 @@ def delete_feedback(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def ban_user(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         json_data = json.loads(request.body)
 
@@ -145,7 +147,7 @@ def ban_user(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def get_banned_user(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         json_data = json.loads(request.body)
 
@@ -158,7 +160,7 @@ def get_banned_user(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def unban_user(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         
         json_data = json.loads(request.body)
 
@@ -197,7 +199,7 @@ def save_model(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def authorization(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         json_data = json.loads(request.body)
 
         auth_result = auth_task.admin_authorization(json_data)
@@ -209,7 +211,7 @@ def authorization(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def lorem_analyze(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         json_data = json.loads(request.body)
 
         analyzed_data = test_task.lorem_analyze(json_data)
@@ -221,7 +223,7 @@ def lorem_analyze(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def analyze_post_body(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         json_data = json.loads(request.body)
 
         analyzed_data = test_task.analyze_post_body(json_data)
@@ -233,7 +235,7 @@ def analyze_post_body(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 def crawl_by_search_word(request):
-    if request.method == 'POST':
+    if request.method in HTTP_METHOD_NAMES:
         json_data = json.loads(request.body)
 
         analyzed_data = test_task.crawl_by_search_word()
