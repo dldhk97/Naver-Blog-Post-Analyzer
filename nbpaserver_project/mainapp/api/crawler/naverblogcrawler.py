@@ -117,23 +117,45 @@ def parse_blog_id(url):
             return s.split('&')[0].split('=')[1]
     return 'Unknown'
 
+HTML_BAN_CLASSES = ['se-blind', 'se-module-oglink', 'se-material-book', 'se-section-placesMap']
+
+def parse_entire_body(content):
+    debug_index = 0
+    try:
+        if 'class' in content.attrs:
+            for c in HTML_BAN_CLASSES:
+                if c in content.attrs['class']:
+                    print('blind')
+                    return []
+
+        text_list = []
+
+        for elem in content.contents:
+            type_str = str(type(elem))
+            if 'Tag' in type_str:
+                t_list = parse_entire_body(elem)
+                for t in t_list:
+                    text_list.append(t)
+            elif 'String' in type_str:
+                text_list.append(elem)
+                # 형제 요소가 없으면 개행
+                # if not content.next_sibling:
+                #     text_list.append('\n')
+        if content.name == 'p':
+            text_list.append('\n')
+        elif len(content.contents) <= 0 and content.name == 'br':
+            text_list.append('\n')
+        return text_list
+    except Exception as e:
+        print('[parse_entire_body] debug_index = ' + str(debug_index) + '\n', e)
+        return [content.get_text()]
+
 # 본문 텍스트 추출
 def parse_entire_body(content):
-    # 자동으로 get_text로 파싱하는 경우 개행문자가 잘 처리되지 않음.
-    # 그래서 try로 수동 html 파싱으로 개행문자를 잘 잡아보려고 했음.
-    # 이 경우 html 구조가 바뀌면 터질 위험이 높기에, 터지는 경우 get_text()로 그냥 통짜로 텍스트 긁어서 처리함.
-
-    try:
-        result = ''
-        for elem in content.find_all(['div', 'p', 'span']):
-            if 'Tag' in str(type(elem)):
-                text = elem.get_text()
-                result += text + '\n'
-            elif 'String' in str(type(elem)):
-                result += str(elem) + '\n'
-    except Exception as e:
-        result = str(content.get_text())
-        print('[naverblogcralwer] Failed to manual html parse while parse_entire_body\n', e)
+    text_list = parse_entire_body(content)
+    result = ''
+    for t in text_list:
+        result += t
 
     if result == '':
         result = content.text
