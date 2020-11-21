@@ -182,7 +182,12 @@ def group_sequential_over_convergence(tok_prob_list):
                 group_list.append(new_group)
                 need_new_group = False
             else:
-                group_list[len(group_list) - 1].append([tok, prob])   
+                prev_group = group_list[len(group_list) - 1]
+                prev_group.append([tok, prob])
+
+                # TEST, 반복그룹이 너무 커지면 짜른다.
+                if len(prev_group) > 2:
+                    need_new_group = True
         else:
             # 제로 컨버전스보다 작으면 새 그룹을 만들어야 한다. 그룹이 끊겼으니까.
             need_new_group = True
