@@ -438,8 +438,8 @@ def lorem_analyze(sents):
                 print('로렘 확률 : ' + json_data['lorem_percentage'])
 
                 for i in range(3):
-                    current = 'sample_' + str(i)
-                    if json_data.get(current):
+                    current = 'sample_' + str(i + 1)
+                    if current in json_data:
                         print(current + ' : ' + json_data[current])
                         tok_prob_list = json_data[current + '_tok_prob_list']
                         print(current + ' 토큰 및 확률 : ')
@@ -481,17 +481,19 @@ def analyze_post_body(url):
                 print('로렘 확률 : ' + json_data['lorem_percentage'])
 
                 for i in range(3):
-                    current = 'sample_' + str(i)
-                    if json_data.get(current):
+                    current = 'sample_' + str(i + 1)
+                    if current in json_data:
                         print(current + ' : ' + json_data[current])
                         tok_prob_list = json_data[current + '_tok_prob_list']
                         print(current + ' 토큰 및 확률 : ')
                         for j in range(len(tok_prob_list)):
                             special_tag = ''
+                            tok = tok_prob_list[j][0]
                             prob = tok_prob_list[j][1]
+                            
                             if prob > 0.025:
                                 special_tag = '\t(!)'
-                            print(str(tokens[j]) + ', ' + str(prob) + special_tag)
+                            print(str(tok) + ', ' + str(prob) + special_tag)
                         print(' ')
                 print('')
 

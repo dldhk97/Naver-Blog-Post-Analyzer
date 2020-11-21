@@ -13,7 +13,7 @@ ZERO_CONVERGENCE_LIMIT = 0.025
 MIN_SENTNCE_LENGTH = 20
 SAMPLES_NUMBER = 3
 
-REPEATING_TOKEN_KILL_LIMIT = 4
+REPEATING_TOKEN_KILL_LIMIT = 2
 
 model = None
 vocab = None
@@ -170,7 +170,15 @@ def group_sequential_over_convergence(tok_prob_list):
         # 제로 컨버전스보다 크면 그룹에 넣는다.
         if prob > ZERO_CONVERGENCE_LIMIT:
             if need_new_group:
-                new_group = [[tok, prob]]
+                new_group = []
+
+                # 확률이 확 뛰는 놈 앞에있는 녀석도 그룹일 확률이 높다.
+                if i > 0:
+                    prev_tok = tok_prob_list[i-1][0]
+                    prev_prob = tok_prob_list[i-1][1]
+                    new_group.append([prev_tok, prev_prob])
+                
+                new_group.append([tok, prob])
                 group_list.append(new_group)
                 need_new_group = False
             else:
