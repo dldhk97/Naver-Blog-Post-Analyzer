@@ -243,10 +243,12 @@ def pasre_blog_post(blog_post_url, api_response_item=None):
                 date = 'UNKNOWN'
                 blog_name = 'UNKNOWN'
 
-            title = parse_title_content(get_real_blog_post_content_soup)
-            body = parse_entire_body(main_content)            # 본문 텍스트 추출
-            hyperlinks = parse_hyperlinks(main_content)       # 하이퍼링크 목록 추출
-            tags = parse_tags(blog_id, log_no)                # 태그 추출(태그는 레이지로딩인거같아 파싱 불가. Json으로 따로 추출)
+            title = util.remove_emoji(parse_title_content(get_real_blog_post_content_soup))
+            body = util.remove_emoji(parse_entire_body(main_content))            # 본문 텍스트 추출
+            hyperlinks = util.remove_emoji(parse_hyperlinks(main_content))        # 하이퍼링크 목록 추출
+            tags = util.remove_emoji(parse_tags(blog_id, log_no))                # 태그 추출(태그는 레이지로딩인거같아 파싱 불가. Json으로 따로 추출)
+            description = util.remove_emoji((description))
+            blog_name = util.remove_emoji(blog_name)
 
             return  blogpost.BlogPost(blog_id, log_no, blog_post_url, title, description, date, blog_name, hyperlinks, tags, body)
     else:
