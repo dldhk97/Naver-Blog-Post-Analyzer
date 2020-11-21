@@ -6,14 +6,16 @@ from .kogpt2.utils import get_tokenizer
 from konlpy.tag import Kkma
 from konlpy.utils import pprint
 
+kkma = Kkma()
 
 VOCAB_SIZE = 50000
 
 ZERO_CONVERGENCE_LIMIT = 0.025
-MIN_SENTNCE_LENGTH = 20
 SAMPLES_NUMBER = 3
 
 REPEATING_TOKEN_KILL_LIMIT = 2
+MAX_SENTNESE_LENGTH = 100
+MIN_SENTNCE_LENGTH = 20
 
 model = None
 vocab = None
@@ -91,66 +93,57 @@ def randomize_samples(lines, n):
     random_samples = random.sample(lines, n)
     return random_samples
 
-# 문장을 종결어미로 나눠서 반환
-kkma = Kkma()
-LONG_SENTNESE_CUTLINE = 100
+# 문장 배열을 받아 꼬꼬마로 잘라 여러 배열로 만듬.
+def split_by_kkma(sent_list):
+    result_list = []
 
-# 커트라인보다 긴 문장은 꼬꼬마로 자르고, 작으면 아무것도 하지않음.
-def sent_cutting(sent):
-    if len(sent) > LONG_SENTNESE_CUTLINE:
-        spltited_sent = kkma.sentences(sent)
-
-        samples = []
-        for s in spltited_sent:
-            if len(s) >= MIN_SENTNCE_LENGTH:
-                samples.append(s)
-
-        if len(samples) > 0:
-            return samples
-    return None
-
-# n개로 나눠 첫문장, 중간문장, 마지막문장을 반환
-def head_tail_samples(lines):
-    if len(lines) >= SAMPLES_NUMBER:
-        splited_head = sent_cutting(lines[0])
-        splited_mid = sent_cutting(lines[int(len(lines) / 2)])
-        splited_tail = sent_cutting(lines[len(lines) - 1])
-
-        head = splited_head[0] if splited_head else lines[0]
-        mid = splited_mid[0] if splited_mid else lines[int(len(lines) / 2)]
-        tail = splited_tail[0] if splited_tail else lines[len(lines) - 1]
-
-        return [head, mid, tail]
-
-    elif len(lines) == 2:
-        # 개행이 제대로 이루어지지 않아서, 혹은 그냥 짧은 문장이면
-        splited_head = sent_cutting(lines[0])
-        splited_tail = sent_cutting(lines[1])
-
-        head = splited_head[0] if splited_head else lines[0]
-        tail = splited_tail[0] if splited_tail else lines[1]
-
-        if splited_head and len(splited_head) >= 2:
-            splited_mid = head_tail_samples(splited_head)
-            for mid in splited_mid:
-                if mid != head:
-                    return [head, mid, tail]
-        if splited_tail and len(splited_tail) >= 2:
-            splited_mid = head_tail_samples(splited_tail)
-            for mid in splited_mid:
-                if mid != tail:
-                    return [head, mid, tail]
-        
-        return [head, tail]
-
+    # 분석가능한 문장이 3개도 안되면
+    if len(sent_list) < 3:
+        # 각 문장들을 꼬꼬마로 자른다.
+        for sent in sent_list:
+            spltited_sent = kkma.sentences(sent)
+            # 잘린 문장들을 저장한다.
+            for s in spltited_sent:
+                result_list.append(s)
+    
+    # 분석가능한 문장이 많으면?
     else:
-        splited = sent_cutting(lines[0])
+        for sent in sent_list:
+            # 최대길이보다 문장이 길면 자른다.
+            if len(sent) > MAX_SENTNESE_LENGTH:
+                spltited_sent = kkma.sentences(sent)
+                for s in spltited_sent:
+                    result_list.append(s)
+            else:
+                result_list.append(sent)
 
-        if splited:
-            if len(splited) >= 2:
-                return head_tail_samples(splited)
-        
-        return [lines[0], ]
+    return result_list
+
+def head_mid_tail_sampling(sent_list):
+    # 3개 이하면 걍 그걸 샘플로 쓰게함.
+    if len(sent_list) <= 3:
+        return sent_list
+    
+    head_index = 0
+    mid_index = int(len(sent_list) / 2)
+    tail_index = len(sent_list) - 1
+
+    # 첫, 마지막 줄로부터 몇문장 떨어질 것인가?
+    edge_weight = 2
+
+    if head_index + edge_weight < mid_index:
+        head_index += edge_weight
+
+    if tail_index - edge_weight > mid_index:
+        tail_index -= edge_weight
+
+    head = sent_list[head_index]
+    mid = sent_list[mid_index]
+    tail = sent_list[tail_index]
+    
+
+    return [head, mid, tail]
+
 
 # !?.,를 제외한 특수문자 제거
 def remove_specials(sent):
@@ -248,20 +241,22 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
     lorem_probs = []
 
     # 개행으로 최소 문자수보다 많은 줄만 추출하고, 특수문자 제거
-    available_lines = []
+    available_sent_list = []
     for s in sentence.split('\n'):
         sent = remove_specials(s).strip()
         if check_min_sentence_length == False:
-            available_lines.append(sent)
+            available_sent_list.append(sent)
         elif len(sent) >= MIN_SENTNCE_LENGTH:
-            available_lines.append(sent)
+            available_sent_list.append(sent)
     # 추출된 줄이 전혀 없으면 에러 반환
-    if len(available_lines) <= 0:
+    if len(available_sent_list) <= 0:
         print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Failed to analysis, No avaliable sents!')
         return -1, None
 
     # N개 샘플 추출
-    samples = head_tail_samples(available_lines)
+    # samples = head_tail_samples(available_lines)
+    splited_sent_list = split_by_kkma(available_sent_list)
+    samples = head_mid_tail_sampling(splited_sent_list)
     samples_with_lorem = []
     
     for s in samples:

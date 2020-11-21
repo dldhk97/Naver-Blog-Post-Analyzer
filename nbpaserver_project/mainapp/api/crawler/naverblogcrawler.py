@@ -121,13 +121,13 @@ def parse_blog_id(url):
     return 'Unknown'
 
 #재귀로 본문 크롤링
-def parse_entire_body(content):
+def recursive_parse_body(content):
     debug_index = 0
     try:
         if 'class' in content.attrs:
             for c in HTML_BAN_CLASSES:
                 if c in content.attrs['class']:
-                    print('blind')
+                    # print(c + ' class skipped ')
                     return []
 
         text_list = []
@@ -135,7 +135,7 @@ def parse_entire_body(content):
         for elem in content.contents:
             type_str = str(type(elem))
             if 'Tag' in type_str:
-                t_list = parse_entire_body(elem)
+                t_list = recursive_parse_body(elem)
                 for t in t_list:
                     text_list.append(t)
             elif 'String' in type_str:
@@ -146,12 +146,12 @@ def parse_entire_body(content):
             text_list.append('\n')
         return text_list
     except Exception as e:
-        print('[parse_entire_body] debug_index = ' + str(debug_index) + '\n', e)
+        print('[recursive_parse_body] debug_index = ' + str(debug_index) + '\n', e)
         return [content.get_text()]
 
 # 본문 텍스트 추출
 def parse_entire_body(content):
-    text_list = parse_entire_body(content)
+    text_list = recursive_parse_body(content)
     result = ''
     for t in text_list:
         result += t
