@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 
 NAVER_API_INFO = None
 
+# html 요소가 해당 class를 가지고 있으면 본문에서 파싱하지 않음.
+HTML_BAN_CLASSES = ['se-blind', 'se-module-oglink', 'se-material-book', 'se-section-placesMap']
+
 def init(naver_api_info):
     print('[SYSTEM][naverblogcrawler]Init constnats')
     global NAVER_API_INFO
@@ -117,8 +120,7 @@ def parse_blog_id(url):
             return s.split('&')[0].split('=')[1]
     return 'Unknown'
 
-HTML_BAN_CLASSES = ['se-blind', 'se-module-oglink', 'se-material-book', 'se-section-placesMap']
-
+#재귀로 본문 크롤링
 def parse_entire_body(content):
     debug_index = 0
     try:
@@ -138,9 +140,6 @@ def parse_entire_body(content):
                     text_list.append(t)
             elif 'String' in type_str:
                 text_list.append(elem)
-                # 형제 요소가 없으면 개행
-                # if not content.next_sibling:
-                #     text_list.append('\n')
         if content.name == 'p':
             text_list.append('\n')
         elif len(content.contents) <= 0 and content.name == 'br':
