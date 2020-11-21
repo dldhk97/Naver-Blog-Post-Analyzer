@@ -104,7 +104,8 @@ def split_by_kkma(sent_list):
             spltited_sent = kkma.sentences(sent)
             # 잘린 문장들을 저장한다.
             for s in spltited_sent:
-                result_list.append(s)
+                if len(s) > MIN_SENTNCE_LENGTH:
+                    result_list.append(s)
     
     # 분석가능한 문장이 많으면?
     else:
@@ -113,8 +114,9 @@ def split_by_kkma(sent_list):
             if len(sent) > MAX_SENTNESE_LENGTH:
                 spltited_sent = kkma.sentences(sent)
                 for s in spltited_sent:
-                    result_list.append(s)
-            else:
+                    if len(s) > MIN_SENTNCE_LENGTH:
+                        result_list.append(s)
+            elif len(sent) > MIN_SENTNCE_LENGTH:
                 result_list.append(sent)
 
     return result_list
@@ -199,7 +201,7 @@ def repeating_sent_killer(tok_prob_list):
 
     kill_target_index = []
     for group in over_convergences:
-        # 4 토큰 이상 연속인 녀석들만 본다.
+        # n 토큰 이상 연속인 녀석들만 본다.
         if len(group) >= REPEATING_TOKEN_KILL_LIMIT:
             # 그룹화된 토큰을 한줄로 만든다.
             toks = ''
