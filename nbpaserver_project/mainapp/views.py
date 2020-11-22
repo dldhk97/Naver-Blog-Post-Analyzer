@@ -91,7 +91,7 @@ def send_feedback(request):
         
         json_data = json.loads(request.body)
 
-        result = core_task.send_feedback(json_data)
+        result = core_task.send_feedback(json_data, request)
 
         # send data to client 
         return JsonResponse(result, safe=False)

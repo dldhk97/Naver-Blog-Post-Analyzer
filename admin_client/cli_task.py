@@ -6,8 +6,7 @@ FEEDBACK_TYPE = [
     'high_lorem',
     'low_hashtag',
     'high_hashtag',
-    'low_ratio',
-    'high_ratio',
+    'ratio',
     'etc',
     'unknown',
     '나가기'

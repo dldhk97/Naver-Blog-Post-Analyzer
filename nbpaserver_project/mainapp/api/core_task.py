@@ -190,7 +190,7 @@ def get_bloginfo(json_data):
 
     return json_data_list
 
-def send_feedback(json_data):
+def send_feedback(json_data, request):
     json_data_list = []
 
     header = {}
@@ -216,7 +216,10 @@ def send_feedback(json_data):
         # 피드백 생성
         feedback = models.Feedback()
         feedback.blog_info = blog_info
-        feedback.ip = json_data['ip']
+        if 'ip' in json_data:
+            feedback.ip = json_data['ip']
+        else:
+            feedback.ip = request_util.get_client_ip(request)
 
         feedback_type_str = json_data['feedback_type']
         feedback_type = models.FeedbackType.objects.filter(name=feedback_type_str)[0]
