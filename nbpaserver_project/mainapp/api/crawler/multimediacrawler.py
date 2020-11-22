@@ -256,9 +256,9 @@ def get_multimedia(blog_post_url):
         # html에서 멀티미디어 객체 리스트 뽑아내기
         images, imos = parse_images(main_content)
         videos = parse_videos(main_content)             # 느림
-        hyperlinks = parse_hyperlink(main_content)
-        etcs = parse_etc(main_content)                  # 느림
-        texts = parse_text(main_content)                # 조금 느림
+        # hyperlinks = parse_hyperlink(main_content)
+        # etcs = parse_etc(main_content)                  # 느림
+        # texts = parse_text(main_content)                # 조금 느림
 
         print('parse done')
 
@@ -269,13 +269,14 @@ def get_multimedia(blog_post_url):
         entire_images_ratio = calc_ratio(images, entire_content_pixel)
         entire_imos_ratio = calc_ratio(imos, entire_content_pixel)
         entire_videos_ratio = calc_ratio(videos, entire_content_pixel)
-        entire_hyperlinks_ratio = calc_ratio(hyperlinks, entire_content_pixel)
-        entire_etcs_ratio = calc_ratio(etcs, entire_content_pixel)
-        entire_texts_ratio = calc_ratio(texts, entire_content_pixel)
-        blanks_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
+        # entire_hyperlinks_ratio = calc_ratio(hyperlinks, entire_content_pixel)
+        # entire_etcs_ratio = calc_ratio(etcs, entire_content_pixel)
+        # entire_texts_ratio = calc_ratio(texts, entire_content_pixel)
+        # blanks_ratio = 1 - entire_images_ratio - entire_imos_ratio - entire_videos_ratio - entire_hyperlinks_ratio - entire_etcs_ratio - entire_texts_ratio
 
         # 이미지, 이모티콘, 비디오, 하이퍼링크, 기타(iframe), 텍스트, 공백 비율 반환
-        result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_texts_ratio, blanks_ratio, entire_etcs_ratio]
+        # result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio, entire_hyperlinks_ratio, entire_texts_ratio, blanks_ratio, entire_etcs_ratio]
+        result_arr = [entire_images_ratio, entire_imos_ratio, entire_videos_ratio]
         return result_arr
 
     except Exception as e:
