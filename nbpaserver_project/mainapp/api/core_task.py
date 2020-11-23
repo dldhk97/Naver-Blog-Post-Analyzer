@@ -93,6 +93,8 @@ def get_entire_info_from_urls(json_array):
                 
             if len(multimedia_ratio_list) > 0:
                 data['multimedia_ratios'] = serializers.serialize('json', multimedia_ratio_list)
+            else:
+                data['multimedia_ratios'] = serializers.serialize('json', [])
 
             json_data_list.append(data)
         except Exception as e:
