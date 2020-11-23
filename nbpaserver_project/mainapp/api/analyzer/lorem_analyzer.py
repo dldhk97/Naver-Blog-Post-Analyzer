@@ -94,7 +94,7 @@ def randomize_samples(lines, n):
     return random_samples
 
 # 문장 배열을 받아 꼬꼬마로 잘라 여러 배열로 만듬.
-def split_by_kkma(sent_list):
+def split_by_kkma(sent_list, check_min_sentence_length=True):
     result_list = []
 
     # 분석가능한 문장이 3개도 안되면
@@ -104,7 +104,10 @@ def split_by_kkma(sent_list):
             spltited_sent = kkma.sentences(sent)
             # 잘린 문장들을 저장한다.
             for s in spltited_sent:
-                if len(s) > MIN_SENTNCE_LENGTH:
+                if check_min_sentence_length:
+                    if len(s) > MIN_SENTNCE_LENGTH:
+                        result_list.append(s)
+                else:
                     result_list.append(s)
     
     # 분석가능한 문장이 많으면?
@@ -114,9 +117,15 @@ def split_by_kkma(sent_list):
             if len(sent) > MAX_SENTNESE_LENGTH:
                 spltited_sent = kkma.sentences(sent)
                 for s in spltited_sent:
-                    if len(s) > MIN_SENTNCE_LENGTH:
+                    if check_min_sentence_length:
+                        if len(s) > MIN_SENTNCE_LENGTH:
+                            result_list.append(s)
+                    else:
                         result_list.append(s)
-            elif len(sent) > MIN_SENTNCE_LENGTH:
+            elif check_min_sentence_length: 
+                if len(sent) > MIN_SENTNCE_LENGTH:
+                    result_list.append(sent)
+            else:
                 result_list.append(sent)
 
     return result_list
@@ -257,7 +266,7 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
 
     # N개 샘플 추출
     # samples = head_tail_samples(available_lines)
-    splited_sent_list = split_by_kkma(available_sent_list)
+    splited_sent_list = split_by_kkma(available_sent_list, check_min_sentence_length)
     samples = head_mid_tail_sampling(splited_sent_list)
     samples_with_lorem = []
     
@@ -266,6 +275,9 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         if len(text) <= 0:
             continue
         tok_prob_list = get_probablities(text)
+        
+        if len(tok_prob_list) <= 0:
+            continue
 
         # 반복되는 문장을 잡는다.
         tok_prob_list = repeating_sent_killer(tok_prob_list)
