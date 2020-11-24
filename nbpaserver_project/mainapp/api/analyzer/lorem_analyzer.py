@@ -266,6 +266,10 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
             available_sent_list.append(sent)
         elif len(sent) >= MIN_SENTNCE_LENGTH:
             available_sent_list.append(sent)
+
+    # 영어만 있는 줄 제거
+    available_sent_list = remove_english_only(available_sent_list)
+    
     # 추출된 줄이 전혀 없으면 에러 반환
     if len(available_sent_list) <= 0:
         print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Failed to analysis, No avaliable sents!')
@@ -274,7 +278,7 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
     # 문장이 길면 꼬꼬마로 자름.
     splited_sent_list = split_by_kkma(available_sent_list, check_min_sentence_length)
     
-    # 영어만 있는 문장은 제외함.
+    # 꼬꼬마로 자른 후 영어만 있는 문장이 있을 수 있기에 영어만 있는 문장 또 제외함.
     english_only_removed = remove_english_only(splited_sent_list)
 
     # 헤드 미드 테일로 3가지 샘플 추출
