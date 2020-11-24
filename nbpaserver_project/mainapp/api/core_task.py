@@ -11,6 +11,18 @@ from .task.task import Task, TaskType
 from .task.task_manager import *
 from .task.bloginfo_task import bloginfo_task
 
+def blog_me_normalization(url):
+    try:
+        splited = url.split('/')
+        head = splited[2]
+        blog_id = head.split('.')
+        blog_id = blog_id[0]
+        log_no = splited[3]
+        return "https://blog.naver.com/" + blog_id + '/' + log_no
+    except Exception as e:
+        print(e)
+        return url
+
 # 분석, 키워드 추출 등 핵심 메소드
 def get_entire_info_from_urls(json_array):
     '''
@@ -29,6 +41,8 @@ def get_entire_info_from_urls(json_array):
             org_url = json_obj['url']
 
             # 블로그 게시글이 아니면 패스
+            if 'blog.me' in org_url:
+                org_url = blog_me_normalization(org_url)
             if 'blog.naver.com' not in org_url:
                 continue
 
