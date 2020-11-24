@@ -310,7 +310,7 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         lorem_probs.append(prob)
         samples_with_lorem.append('(' + str(round(prob, 3)) + ') ' + s)
 
-    if lorem_probs and len(lorem_probs > 0):
+    if lorem_probs and len(lorem_probs) > 0:
         lorem_percentage = numpy.mean(lorem_probs)
         return lorem_percentage, samples_with_lorem
 
