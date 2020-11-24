@@ -161,6 +161,13 @@ def remove_specials(sent):
     special_removed_sent = re.compile('[\{\}\[\]\/;:|\)*~`^\-_+<>@\#$%&\\\=\(\'\"]').sub('', sent)
     return special_removed_sent
 
+def remove_english_only(sents):
+    result = []
+    for sent in sents:
+        if not re.compile('^[a-zA-Z0-9._# -\:]*$').match(sent):
+            result.append(sent)
+    return result
+
 # 연속적으로 제로 컨버전스 이상인 녀석들을 그룹화
 def group_sequential_over_convergence(tok_prob_list):
     # 확률 배열을 돌면서
@@ -264,10 +271,14 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         print('[SYSTEM][lorem_analyzer][get_lorem_percentage] Failed to analysis, No avaliable sents!')
         return -1, None
 
-    # N개 샘플 추출
-    # samples = head_tail_samples(available_lines)
+    # 문장이 길면 꼬꼬마로 자름.
     splited_sent_list = split_by_kkma(available_sent_list, check_min_sentence_length)
-    samples = head_mid_tail_sampling(splited_sent_list)
+    
+    # 영어만 있는 문장은 제외함.
+    english_only_removed = remove_english_only(splited_sent_list)
+
+    # 헤드 미드 테일로 3가지 샘플 추출
+    samples = head_mid_tail_sampling(english_only_removed)
     samples_with_lorem = []
     
     for s in samples:
@@ -299,7 +310,7 @@ def get_lorem_percentage(sentence, check_min_sentence_length=True):
         lorem_probs.append(prob)
         samples_with_lorem.append('(' + str(round(prob, 3)) + ') ' + s)
 
-    if lorem_probs:
+    if lorem_probs and len(lorem_probs > 0):
         lorem_percentage = numpy.mean(lorem_probs)
         return lorem_percentage, samples_with_lorem
 
