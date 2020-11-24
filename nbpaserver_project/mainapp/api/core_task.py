@@ -99,11 +99,15 @@ def get_entire_info_from_urls(json_array):
             data['blog_info'] = serializers.serialize('json', [blog_info, ])
             if analyzed_info:
                 data['analyzed_info'] = serializers.serialize('json', [analyzed_info, ])
+            else:
+                data['analyzed_info'] = serializers.serialize('json', [])
 
             data['tags'] = serializers.serialize('json', tag_list)
             data['hyperlinks'] = serializers.serialize('json', hyperlink_list)
             if len(keyword_list) > 0:
                 data['keywords'] = serializers.serialize('json', keyword_list)
+            else:
+                data['keywords'] = serializers.serialize('json', [])
                 
             if len(multimedia_ratio_list) > 0:
                 data['multimedia_ratios'] = serializers.serialize('json', multimedia_ratio_list)
