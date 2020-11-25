@@ -1,10 +1,9 @@
-# Naver Blog Post Analyzer
-네이버 블로그 게시글 분석기(Naver Blog Post Analyzer)
-
-크롬 확장프로그램과 연동하여 네이버 블로그 게시글의 정보를 분석합니다.
+# 네이버 블로그 게시글 분석기(Naver Blog Post Analyzer)
+2020 2학기 창의융합설계 과목의 프로젝트입니다.
 
 Django 서버와 관리자용 콘솔 클라이언트로 구성되어 있습니다.
 
+서버는 크롬 확장프로그램과 연동하여 네이버 블로그 게시글의 정보를 분석합니다.
 
 ## 설치방법(Windows)
 ```
